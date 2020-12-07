@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<config>
+	<win32>
+		<srcDirName>D:\persdata\Marion\Autolackiererei_Haertter\develop</srcDirName>
+		<tgtDirName value="D:\persdata\Marion\Autolackiererei_Haertter\develop" />
+	</win32>
+	<linux2>
+		<!-- <srcDirName value="/localdrives/F/mp3car/010MP3CAR/06_Björk_Telegram" /> -->
+		<srcDirName>/localdrives/E/userdata/persdata/Marion/Autolackiererei_Haertter</srcDirName>
+		<tgtDirName value="/localdrives/E/userdata/persdata/Marion/Autolackiererei_Haertter" />
+	</linux2>
+	<generic>
+		<!-- 
+		<srcFilename value="Architekten72_kwrite_utf8_notab.txt" />
+		<tgtFilename value="Architekten72_kwrite_utf8.csv" />
+		<srcFilename value="Architekten71_utf8_notab.txt" />
+		<tgtFilename value="Architekten71_utf8_notab.csv" />
+		-->
+		<srcFilename value="Innenarchitekten7_utf8_notab.txt" />
+		<tgtFilename value="Innenarchitekten7_utf8.csv" />
+		<fileformat value="Architekt" />
+	</generic>
+</config>

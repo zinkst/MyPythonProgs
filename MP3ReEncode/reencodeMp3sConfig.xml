@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<config>
+	<win32>
+		<!-- <srcDirName value="F:\mp3car\010MP3CAR\06_Björk_Telegram" /> -->
+		<srcDirName>E:\mp3car\010MP3CAR\</srcDirName>
+		<tgtDirName value="e:\mp3car\010MP3STICK" />
+		<mp3Encoder value="C:\Programs\Multimedia\lame\lame.exe" />
+	</win32>
+	<linux2>
+		<!-- <srcDirName value="/localdrives/E/mp3/car/010MP3CAR/06_Coldplay_X&Y" /> -->
+		<srcDirName>/links/Music/Alben/Unheilig/Grosse Freiheit</srcDirName>
+		<tgtDirName value="/links/Music/stick" />
+		<mp3Encoder value="lame" />
+	</linux2>
+	<generic>
+		<encodingOptions value="-V 9 --silent --add-id3v2" />
+	</generic>
+</config>

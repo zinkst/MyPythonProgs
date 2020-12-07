@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<config>
+	<win32>
+		<srcDirName>D:\persdata\Stefan\OpenOffice\Adressdatei\</srcDirName>
+		<tgtDirName value="D:\persdata\Stefan\OpenOffice\Adressdatei\" />
+	</win32>
+	<linux2>
+		<!-- productionData 
+		<rootDir value="/local/data/Photos/2008" />
+		<relPathToLinks>Favoriten/Schweden</relPathToLinks> 
+		--> 
+		<!-- testData -->			
+		<rootDir value="/home/zinks/Stefan/myPrg/MyPythonPrgs/SwapLinkAndFile/testdata/test/2008" />
+		<relPathToLinks>Favoriten/Schweden</relPathToLinks> 
+		
+	</linux2>
+	<generic>
+ 		<!-- productionData -->
+	    
+		<!-- testData -->
+			
+	</generic>
+</config>

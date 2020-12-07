@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<config>
+	<win32>
+		<srcDirName>D:\persdata\Stefan\OpenOffice\Adressdatei\</srcDirName>
+		<tgtDirName value="D:\persdata\Stefan\OpenOffice\Adressdatei\" />
+	</win32>
+	<linux2>
+		<!-- productionData 
+		<srcDirName>/home/zinks/persdata/Stefan/PhotosFavoriten</srcDirName> 
+		<tgtDirName value="/localdrives/D/persdata/Stefan/myPrg/MyPythonPrgs/ManagePhotoFavorites/testData/links" />
+		-->
+		<!-- testData --> 
+		<srcDirName>/links/persdata/Stefan/myPrg/MyPythonPrgs/ConvertAccesscodes/testdata</srcDirName>
+		<tgtDirName>/links/persdata/Stefan/myPrg/MyPythonPrgs/ConvertAccesscodes/testdata</tgtDirName>
+		
+	</linux2>
+	<generic>
+ 		<!-- productionData -->
+		<srcFileNames> 
+			<el>privat.csv</el>
+			<el>Arbeit.csv</el>
+			<el>periodic.csv</el>
+		</srcFileNames>
+		<tgtFileName value="keepassx.xml" />
+		<!-- testData
+		<srcFilename value="2008Favoriten.txt" />
+		<tgtFilename value="2008Favoriten.txt" />
+		-->
+	</generic>
+</config>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<config>
+	<win32>
+		<srcDirName>D:\persdata\Stefan\OpenOffice\Adressdatei\</srcDirName>
+		<tgtDirName value="D:\persdata\Stefan\OpenOffice\Adressdatei\" />
+	</win32>
+	<linux2>
+		<!-- <srcDirName value="/localdrives/F/mp3car/010MP3CAR/06_Björk_Telegram" /> -->
+		<srcDirName>/home/zinks/persdata/Stefan/OpenOffice/Adressdatei</srcDirName>
+		<tgtDirName value="/home/zinks/persdata/Stefan/OpenOffice/Adressdatei" />
+	</linux2>
+	<generic>
+<!--
+		<srcFilename value="Adresstabelle_UTF8_withComma.csv" />
+		<tgtFilename value="Thunderbird_withComma.csv" />
+-->
+ 		<srcFilename value="Adresstabelle.csv" />
+		<tgtThunderbirdName value="ThunderbirdStefan.csv" />
+		<tgtGigasetName value="GigasetStefan.vcf" />
+		<tgtTSinusName value="TSinusStefan.vcf" />
+		<tgtGMXName value="GMXStefan.csv" />
+        <tgtSamsungKiesName value="SamsungKiesStefan.csv" />
+        <tgtSamsungAndroidVCFName value="SamsungAndroidStefan.vcf" />
+        <tgtGeburtstageICSName value="GeburtstageStefan.ics" />
+        <tgtGMailContactsCSVName value="GMailContacts.csv" />
+	</generic>
+</config>

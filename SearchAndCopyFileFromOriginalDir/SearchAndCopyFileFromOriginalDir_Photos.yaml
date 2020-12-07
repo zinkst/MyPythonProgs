@@ -1,0 +1,24 @@
+# use production or development config
+configuration: production
+# create hardlinks or soft links
+# valid values [ hard , soft ]
+linkType: hard
+loglevel: INFO
+# extension of files which are used in search (case insensitive)
+searchExtension: [jpg, jpeg]
+develop:
+    # directory where files are from which the originals are to be searched
+    COPIES-ORIG-DIR: src
+    COPIES-TGT-DIR: Entwickeln_hardlinksabs
+    NOTFOUND_FILES_TGT_DIR: Entwickeln_Not_Found_Files_Dir
+    # directories where Originale are searched
+    ORIGINALS-DIRS: [originale]
+    ROOT-DIR: /links/persdata/Stefan/myPrg/MyPythonPrgs/SearchAndCopyFileFromOriginalDir/testdata/Photo/
+    SIMULATE: false
+production:
+    COPIES-ORIG-DIR: Entwickeln
+    COPIES-TGT-DIR: Entwickeln_hardlinksabs
+    NOTFOUND_FILES_TGT_DIR: Entwickeln_Not_Found_Files_Dir
+    ORIGINALS-DIRS: [Sammlung]
+    ROOT-DIR: /links/Photos/
+    SIMULATE: false

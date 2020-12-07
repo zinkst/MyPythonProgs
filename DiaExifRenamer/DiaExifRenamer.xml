@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<config>
+	<win32>
+		<!-- <srcDirName value="F:\mp3car\010MP3CAR\06_Björk_Telegram" /> -->
+		<srcDirName>E:\mp3car\010MP3CAR\</srcDirName>
+		<tgtDirName value="e:\mp3car\010MP3STICK" />
+		<mp3Encoder value="C:\Programs\Multimedia\lame\lame.exe" />
+	</win32>
+	<linux2>
+		<!-- testdata   
+		
+		<workDirName>/links/backup/PhotosRework/inProgress/1989/198902_Livignio/ProfiDiaScan</workDirName> 
+        <infoSrcDirName>/home/zinks/persdata/Stefan/myPrg/MyPythonPrgs/DiaExifRenamer/testdata/tgt</infoSrcDirName>
+		 -->
+		<!-- production --> 
+		<workDirName>/local/data/PhotosRework/inProgress/2001/Gemeinsam/200109_Silvretta 31.8 - 3.9/ProfiDiaScan Marion</workDirName> 
+        <infoSrcDirName>/local/data/PhotosRework/inProgress/2001/Gemeinsam/200109_Silvretta 31.8 - 3.9/FlachbettDiaScan</infoSrcDirName>
+		 
+		<toolName value="exiftool" />
+		<fileList>/links/persdata/Stefan/Desktop/fileList.txt</fileList>
+        
+	</linux2>
+	<generic>
+		<toolOptions value="-P -overwrite_original " />
+		<fileFilter value="*.jpg" />
+		<useList value="nTrue" />
+	</generic>
+	<!--  exiftool -P -CreateDate='2009.05.06 06:47:00' -DateTimeDigitized='2009.05.06 06:47:00' -DateTimeOriginal=1995:05:24 -comment='Löwensteiner Berge' -UserComment='Löwensteiner Berge User' 1995_Nordeuropatour/1995A/1995A02_0524_Löwensteiner\ Berge.jpg  --> 
+</config>

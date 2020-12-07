@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<config>
+	<win32>
+		<srcDirName>D:\persdata\Stefan\OpenOffice\Adressdatei\</srcDirName>
+		<tgtDirName value="D:\persdata\Stefan\OpenOffice\Adressdatei\" />
+	</win32>
+	<linux2>
+		<!-- productionData --> 
+		<srcDirName>/home/zinks/Photos/1986 - 2000 Sonstige Photos von Stefan /1995_Nordeuropatour</srcDirName> 
+		<tgtDirName>/home/zinks/Photos/1986 - 2000 Sonstige Photos von Stefan /1995_Nordeuropatour</tgtDirName>
+		<projectDirName>/home/zinks/Photos/1986 - 2000 Sonstige Photos von Stefan /1995_Nordeuropatour</projectDirName>
+
+		<!-- testData 
+		<srcDirName>/home/zinks/persdata/Stefan/myPrg/MyPythonPrgs/ConvertDiaShowCSV/testData</srcDirName>
+		<tgtDirName>/home/zinks/persdata/Stefan/myPrg/MyPythonPrgs/ConvertDiaShowCSV/testData</tgtDirName>
+		<projectDirName>/home/zinks/persdata/Stefan/myPrg/MyPythonPrgs/ConvertDiaShowCSV/testData/src/1995_Nordeuropatour</projectDirName>
+	-->
+	</linux2>
+	<generic>
+ 		<!-- productionData -->
+		<srcFileName value="1995NordeuropaVortrag.csv" />
+		<tgtFileName value="1995NordeuropaVortrag.lst" />
+		<debug>false</debug>
+		<!-- testData
+		<srcFileName value="1995NordeuropaVortrag_Test.csv" />
+		<tgtFileName value="1995NordeuropaVortrag_Test.lst" />
+		-->
+	</generic>
+</config>

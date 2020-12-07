@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<config>
+	<win32>
+		<srcDirName>D:\persdata\Stefan\OpenOffice\Adressdatei\</srcDirName>
+		<tgtDirName value="D:\persdata\Stefan\OpenOffice\Adressdatei\" />
+	</win32>
+	<linux2>
+		<!-- <srcDirName value="/localdrives/F/mp3car/010MP3CAR/06_Björk_Telegram" /> -->
+		<srcDirName>/links/persdata/marion/Privat</srcDirName>
+		<tgtDirName value="/links/persdata/marion/Privat" />
+<!--  	<tgtDirName value="/home/zinks/persdata/Marion/Privat" /> -->
+	</linux2>
+	<generic>
+<!--
+		<srcFilename value="Adresstabelle_UTF8_withComma.csv" />
+		<tgtFilename value="Thunderbird_withComma.csv" />
+-->
+ 		<srcFilename value="Adressenliste.csv" />
+		<tgtThunderbirdName value="ThunderbirdMary.csv" />
+		<tgtGigasetName value="GigasetMary.vcf" />
+		<tgtTSinusName value="TSinusMary.vcf" />
+		<tgtGMXName value="GMXMarion.csv" />
+    	<tgtSamsungKiesName value="SamsungKiesMarion.csv" />
+        <tgtSamsungAndroidVCFName value="SamsungAndroidMarion.vcf" />
+        <tgtGeburtstageICSName value="GeburtstageMarion.ics" />
+        <tgtGMailContactsCSVName value="GMailContactsMarion.csv" />
+
+	</generic>
+</config>

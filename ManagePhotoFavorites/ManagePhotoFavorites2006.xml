@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<config>
+	<win32>
+		<srcDirName>D:\persdata\Stefan\OpenOffice\Adressdatei\</srcDirName>
+		<tgtDirName value="D:\persdata\Stefan\OpenOffice\Adressdatei\" />
+	</win32>
+	<linux2>
+		<!-- productionData -->
+		<relLinkTgtDirName value="/localdrives/D/Photos/2006/Favoriten/linksrel" />
+		<srcDirName>/localdrives/D/persdata/Stefan/PhotosFavoriten</srcDirName> 
+		<workDirName>/localdrives/backup/Photos/2006/</workDirName> 
+		<!-- testData 
+		<srcDirName>/localdrives/D/persdata/Stefan/myPrg/MyPythonPrgs/ManagePhotoFavorites/testData</srcDirName>
+		<workDirName>/localdrives/D/persdata/Stefan/myPrg/MyPythonPrgs/ManagePhotoFavorites/testData</workDirName>
+		<tgtDirName value="/localdrives/D/persdata/Stefan/myPrg/MyPythonPrgs/ManagePhotoFavorites/testData/links" />
+			-->
+	</linux2>
+	<generic>
+ 		<!-- productionData -->
+	    <linkPrefix value="../../" /> 
+		 
+		<!-- testData
+		<linkPrefix value="../files" /> 
+		-->
+		<srcFilename value="2006Favoriten.txt" />
+			
+	</generic>
+</config>

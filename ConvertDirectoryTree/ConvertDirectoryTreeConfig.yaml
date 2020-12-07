@@ -1,0 +1,11 @@
+fileFilter: "*.jpg" 
+#srcDirName: "/links/Stefan/privat/myPrg/MyPythonPrgs/ConvertDirectoryTree/testdata/src"
+srcDirName: "/links/Photos/Converted/1920/2016"
+#tgtDirName: "/links/Stefan/privat/myPrg/MyPythonPrgs/ConvertDirectoryTree/testdata/tgt"
+tgtDirName: "/home/zinks/Pictures"
+#tgtDirName: "/links/Photos/Wallpapers"
+#toolName: (copy|symlink) 
+toolName: symlink
+
+#toolOptions: (preserveDirStructure|flat)
+toolOptions: flat

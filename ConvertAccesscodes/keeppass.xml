@@ -1,0 +1,27 @@
+<!DOCTYPE KEEPASSX_DATABASE>
+<database>
+ <group>
+  <title>Internet</title>
+  <icon>1</icon>
+ </group>
+ <group>
+  <title>eMail</title>
+  <icon>19</icon>
+ </group>
+ <group>
+  <title>privat</title>
+  <icon>0</icon>
+  <entry>
+   <title>zifts@gmx.de</title>
+   <username>zifts@gmx.de</username>
+   <password>pw4zifts</password>
+   <url>http://gmx.net</url>
+   <comment>standard</comment>
+   <icon>0</icon>
+   <creation>2012-03-20T22:20:07</creation>
+   <lastaccess>2012-03-20T22:21:01</lastaccess>
+   <lastmod>2012-03-20T22:21:01</lastmod>
+   <expire>Nie</expire>
+  </entry>
+ </group>
+</database>

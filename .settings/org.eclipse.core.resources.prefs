@@ -1,0 +1,17 @@
+eclipse.preferences.version=1
+encoding//ConvertAccesscodes/ConvertAcesscodes.py=utf-8
+encoding//ConvertAdressCSV/ConvertAdressCSV.py=utf-8
+encoding//ConvertDirectoryTree/ConvertDirectoryTree.py=utf-8
+encoding//DiaExifRenamer/DiaExifRenamer.py=utf-8
+encoding//DiaFileRenamer/DiaFileRenamer.py=utf-8
+encoding//GenerateBindZoneFile/GenerateBindZoneFile.py=utf-8
+encoding//MP3ReEncode/reencodeMp3s.py=utf-8
+encoding//ManagePhotoFavorites/ManagePhotoFavorites.py=utf-8
+encoding//ProcessFile/ProcessFile.py=utf-8
+encoding//ProcessMp3sInDir/ProcessMp3sInDir.py=utf-8
+encoding//SearchAndCopyFileFromOriginalDir/FileObject.py=utf-8
+encoding//SearchAndCopyFileFromOriginalDir/SearchAndCopyFileFromOriginalDir.py=utf-8
+encoding//SwapLinkAndFile/LinkObject.py=utf-8
+encoding//SwapLinkAndFile/SwapLinkAndFile.py=utf-8
+encoding//lib/functions.py=utf-8
+encoding//lib/scriptutil.py=utf-8

@@ -1,0 +1,44 @@
+#This program has two modies:
+#As input you can either give a Source Directory or a file with list files to process 
+#Currently when a directory is given it search for files with rating equal or higher the ratingThreshold and 
+#copies found files to the target dir with an indes structure
+#When a playlist is given default is to add the newFMPSRating is set for all found files. Also POPM and RATING tags are set accordingly
+
+# use production or development config
+configuration: develop
+#configuration: production
+
+#loglevel: DEBUG
+loglevel: INFO
+fileFilter: mp3 
+develop:
+  #linkDirName: /links/Stefan/myPrg/MyPythonPrgs/ProcessMp3sInDir/testdata/src/car_links
+  linkDirName: /links/Stefan/privat/myPrg/MyPythonPrgs/ProcessMp3sInDir/testdata/src/Sammlung
+  tgtDirName:  /links/Stefan/privat/myPrg/MyPythonPrgs/ProcessMp3sInDir/testdata/tgt
+  m3uDirName: /links/Stefan/privat/myPrg/MyPythonPrgs/ProcessMp3sInDir/testdata/tgt/Playlists
+  srcDirName: /links/Stefan/privat/myPrg/MyPythonPrgs/ProcessMp3sInDir/testdata/src/Sammlung
+  srcPlaylistFile: /links/Stefan/privat/myPrg/MyPythonPrgs/ProcessMp3sInDir/testdata/src/playlist.txt
+  # srcType [ dir | playlist ]
+  srcType: dir
+  newFMPSRating: 0.8
+  ratingThreshold: 0.4
+  # use lame to renencode 
+  reencode: false
+  lame_params: -V 8
+production:
+  #linkDirName: /local/backup/Musik/car_links
+  linkDirName:  /links/Musik/Sammlung  
+  tgtDirName:   /links/Musik/BesteBewertung
+  m3uDirName:   /links/Musik/Playlists
+  srcDirName:  /links/Musik/Sammlung
+  dirNameOnFiler: /shares/Filer/Musik/Sammlung/
+  #srcDirName: /local/backup/Musik/Sammlung/Alben/Coldplay
+  srcPlaylistFile: /links/Musik/Stefan/3,5 Sterne.m3u
+#  srcPlaylistFile: /links/Musik/Stefan/test.m3u
+  # srcType [ dir | playlist ]
+  srcType: playlist
+  newFMPSRating: 0.7
+  ratingThreshold: 0.4
+  # use lame to renencode 
+  reencode: false
+  lame_params: -V 8

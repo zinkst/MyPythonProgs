@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<config>
+	<win32>
+		<srcDirName>D:\persdata\Marion\Autolackiererei_Haertter</srcDirName>
+		<tgtDirName value="D:\persdata\Marion\Autolackiererei_Haertter" />
+	</win32>
+	<linux2>
+		<!-- <srcDirName value="/localdrives/F/mp3car/010MP3CAR/06_Björk_Telegram" /> -->
+		<srcDirName>/localdrives/D/persdata/Marion/Autolackiererei_Haertter</srcDirName>
+		<tgtDirName value="/localdrives/D/persdata/Marion/Autolackiererei_Haertter" />
+	</linux2>
+	<generic>
+		<srcFilename value="AutohaeuserUSW.txt" />
+		<tgtFilename value="AutohaeuserUSW.csv" />
+		<fileformat value="Versicherung" />
+	</generic>
+</config>

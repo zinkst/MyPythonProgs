@@ -1,0 +1,12 @@
+{
+    "dns_hostname": "cil021029005", 
+    "domain": "cil021029.ibm.com", 
+    "hostnameDelimiter": "", 
+    "hostnamePrefix": "cil021", 
+    "subnet": "172.21", 
+    "subnetNumbers": [
+        29
+    ], 
+    "subnetReverse": "21.172",
+    "outFilePath" : "/links/persdata/Stefan/myPrg/MyPythonPrgs/GenerateBindZoneFile/"
+}

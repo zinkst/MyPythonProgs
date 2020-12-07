@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<config>
+	<win32>
+		<!-- <srcDirName value="F:\mp3car\010MP3CAR\06_Björk_Telegram" /> -->
+		<srcDirName>E:\mp3car\010MP3CAR\</srcDirName>
+		<tgtDirName value="e:\mp3car\010MP3STICK" />
+		<mp3Encoder value="C:\Programs\Multimedia\lame\lame.exe" />
+	</win32>
+	<linux2>
+		<!-- testdata -->
+		<srcDirName>/home/zinks/Stefan/myPrg/MyPythonPrgs/DiaFileRenamer/testdata/work/1995_Nordeuropatour/FlachbettDiascan</srcDirName>
+		<tgtDirName value="/home/zinks/Stefan/myPrg/MyPythonPrgs/DiaFileRenamer/testdata/work/1995_Nordeuropatour/AllDiasScan" />
+		
+		<!-- production 
+		<srcDirName>/home/zinks/Photos/1986 - 2000 Sonstige Photos von Stefan /1995_Nordeuropatour</srcDirName> 
+		<tgtDirName value="/home/zinks/Photos/1986 - 2000 Sonstige Photos von Stefan /1995_Nordeuropatour" />
+		--> 
+		<toolName value="mv" />
+		
+	</linux2>
+	<generic>
+		<simulate>true</simulate>
+		<filePattern value=".jpg" />
+	</generic>
+</config>

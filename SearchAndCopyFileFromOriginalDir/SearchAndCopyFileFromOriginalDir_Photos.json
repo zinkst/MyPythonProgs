@@ -1,0 +1,28 @@
+{
+    "configuration" : "production" ,
+    "searchExtension" : [ "jpg" ,"jpeg" ] ,
+    "loglevel"	: "INFO" ,
+    "linkType" : "hard" ,
+    "develop" :  
+    		{
+	    		"SIMULATE": false, 
+	 	    	"COPIES-ORIG-DIR": "src", 
+	    		"COPIES-TGT-DIR": "Entwickeln_hardlinksabs", 
+	    		"NOTFOUND_FILES_TGT_DIR": "Entwickeln_Not_Found_Files_Dir", 
+	    		"ORIGINALS-DIRS": [
+	        		"originale"
+	    		], 
+	    		"ROOT-DIR": "/links/persdata/Stefan/myPrg/MyPythonPrgs/SearchAndCopyFileFromOriginalDir/testdata/Photo/"
+	    	},
+    "production" :  
+	    	{
+		 	 	"SIMULATE": false, 
+		 	    "COPIES-ORIG-DIR": "Entwickeln", 
+		    	"COPIES-TGT-DIR": "Entwickeln_hardlinksabs", 
+		    	"NOTFOUND_FILES_TGT_DIR": "Entwickeln_Not_Found_Files_Dir", 
+		    	"ORIGINALS-DIRS": [ 
+		    						"Sammlung"
+				      			  ], 
+		    	"ROOT-DIR": "/links/Photos/"
+	    	}
+}
