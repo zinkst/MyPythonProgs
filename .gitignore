@@ -1,0 +1,5 @@
+.vscode
+testdata/
+CVS/
+*.pyc
+*.pyo
