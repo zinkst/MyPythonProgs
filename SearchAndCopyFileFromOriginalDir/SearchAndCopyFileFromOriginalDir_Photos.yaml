@@ -1,19 +1,19 @@
 # use production or development config
-configuration: production
+configuration: develop
 # create hardlinks or soft links
 # valid values [ hard , soft ]
-linkType: hard
+linkType: soft
 loglevel: INFO
 # extension of files which are used in search (case insensitive)
-searchExtension: [jpg, jpeg]
+searchExtension: [mp4, mkv]
 develop:
     # directory where files are from which the originals are to be searched
-    COPIES-ORIG-DIR: src
-    COPIES-TGT-DIR: Entwickeln_hardlinksabs
+    COPIES-ORIG-DIR: USB-Stick-Gerhard
+    COPIES-TGT-DIR: links-USB-Stick-Gerhard
     NOTFOUND_FILES_TGT_DIR: Entwickeln_Not_Found_Files_Dir
     # directories where Originale are searched
-    ORIGINALS-DIRS: [originale]
-    ROOT-DIR: /links/persdata/Stefan/myPrg/MyPythonPrgs/SearchAndCopyFileFromOriginalDir/testdata/Photo/
+    ORIGINALS-DIRS: [Familie-Zink-Videos]
+    ROOT-DIR:  /links/FamilienVideos/
     SIMULATE: false
 production:
     COPIES-ORIG-DIR: Entwickeln
