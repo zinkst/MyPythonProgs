@@ -24,18 +24,31 @@ from dataTypes import RuntimeData
 
 ############################################################################
 def findTGTFileName(activeSrcCompleteFileName,srcDirName,tgtDirName):
-    logging.debug(" activeSrcCompleteFileName = " + activeSrcCompleteFileName)
-    logging.debug(" srcDirName = " + srcDirName)
-    logging.debug(" tgtDirName = " + tgtDirName)
-    #fileName = os.path.basename(activeSrcCompleteFileName)
-    srcRelativePathName=activeSrcCompleteFileName[len(srcDirName):]
-    logging.debug(" srcRelativePathName = " + srcRelativePathName)
-    tgtCompleteFileName = tgtDirName +srcRelativePathName
-    logging.debug(" tgtCompleteFileName = " + tgtCompleteFileName)
-    (tgtSubdirName,tail)=os.path.split(tgtCompleteFileName)
-    logging.debug(" tgtSubdirName = " + tgtDirName)
-    if not os.path.exists(tgtSubdirName):
+    # logging.debug("activeSrcCompleteFileName = " + activeSrcCompleteFileName)
+    # logging.debug("srcDirName = " + srcDirName)
+    # logging.debug("tgtDirName = " + tgtDirName)
+    
+    if inputParams["toolOptions"] == "flat":
+      tgtCompleteFileName = os.path.join(tgtDirName, os.path.basename(activeSrcCompleteFileName))
+    elif inputParams["toolOptions"] == "preserveDirStructure":
+      srcRelativePathName=activeSrcCompleteFileName[len(srcDirName):]
+      logging.debug(" srcRelativePathName = " + srcRelativePathName)
+      tgtCompleteFileName = tgtDirName +srcRelativePathName
+      logging.debug(" tgtCompleteFileName = " + tgtCompleteFileName)
+      (tgtSubdirName,tail)=os.path.split(tgtCompleteFileName)
+      logging.debug(" tgtSubdirName = " + tgtDirName)
+      if not os.path.exists(tgtSubdirName):
         os.makedirs(tgtSubdirName, mode=0o775 )
+    else:   
+      logging.error("unknown option %s" % inputParams["toolOptions"])
+      exit(-1)
+    
+    if not os.path.exists(tgtDirName):
+      try:
+        os.mkdir(tgtDirName)
+      except OSError:
+         print ("Creation of the directory %s failed" % tgtDirName)
+         exit(-1) 
     return tgtCompleteFileName
      
 ############################################################################
@@ -54,40 +67,18 @@ def initLogger():
 ###################################################################################################
 
 ###########################################################################
-def processFile(activeSrcCompleteFileName, tgtDirName, toolOptions):
-    if toolOptions == "flat":
-        fullTargetName = os.path.join(tgtDirName, os.path.basename(activeSrcCompleteFileName))
-    elif toolOptions == "preserveDirStructure":
-        fullTargetName=findTGTFileName(activeSrcCompleteFileName, runtimeData.activeSrcDirName, tgtDirName)
-    else:   
-      logging.error("unknown option %s" % toolOptions)
-      exit
-    
-    if not os.path.exists(tgtDirName):
-      try:
-        os.mkdir(tgtDirName)
-      except OSError:
-         print ("Creation of the directory %s failed" % tgtDirName)
-         exit(-1) 
-    
-    if not os.path.exists(fullTargetName):
-      logging.info("shutil.copy2(\"%s\",\"%s\"" % (activeSrcCompleteFileName,tgtDirName ))
-      shutil.copy2(activeSrcCompleteFileName,fullTargetName)
-    
-    # <tbd> remove late
-    shutil.copy2(activeSrcCompleteFileName,fullTargetName)
-     
-    # if runtimeData.previousDateTime"] == "":
-    #   runtimeData.previousDateTime"]=
-    metadata = pyexiv2.ImageMetadata(fullTargetName)
-    # avaliaböe Tags see https://exiv2.org/tags.html
+def processFile(activeSrcCompleteFileName, activeTgtCompleteFileName, toolOptions):
+    shutil.copy2(activeSrcCompleteFileName,activeTgtCompleteFileName)
+    logging.info("Processing %s" %(os.path.basename(activeTgtCompleteFileName))) 
+    metadata = pyexiv2.ImageMetadata(activeTgtCompleteFileName)
+    # avaliable Tags see https://exiv2.org/tags.html
     metadata.read() 
     
     # set DateTime Digitized to fileCreationDate
     fileCreationDate=datetime.fromtimestamp(os.path.getmtime(activeSrcCompleteFileName))
-    logging.debug( "fileCreationDate: %s of Image: %s" % (fileCreationDate, fullTargetName) )
+    logging.debug( "fileCreationDate: %s of Image: %s" % (fileCreationDate, activeTgtCompleteFileName) )
     metadata["Exif.Photo.DateTimeDigitized"]=fileCreationDate
-
+    
     # set new Creation Date 
     runtimeData.dateTimeOrig = metadata['Exif.Image.DateTime'].value
     if runtimeData.previousDateTime == datetime.fromtimestamp(0):
@@ -96,13 +87,17 @@ def processFile(activeSrcCompleteFileName, tgtDirName, toolOptions):
       runtimeData.currentIncrement = runtimeData.currentIncrement + inputParams["incrementMinutes"]
     else:  
       runtimeData.currentIncrement = inputParams["dayoffsethours"]*60
-    logging.debug( "dateTime: %s of Image: %s" % (runtimeData.dateTimeOrig, fullTargetName) ) 
+    logging.debug( "dateTime: %s of Image: %s" % (runtimeData.dateTimeOrig, activeTgtCompleteFileName) ) 
     incrementedDateTime = runtimeData.dateTimeOrig + timedelta(minutes=runtimeData.currentIncrement)
     metadata['Exif.Image.DateTime'].value = incrementedDateTime
     metadata['Exif.Photo.DateTimeOriginal'].value = incrementedDateTime
     
+    # copy comment to Image Title
+    comment=metadata["Exif.Photo.UserComment"].value
+    metadata["Xmp.dc.title"] = {'x-default': comment }
     
     metadata.write()
+    os.utime(activeTgtCompleteFileName, (fileCreationDate.timestamp(), incrementedDateTime.timestamp()))
     runtimeData.previousDateTime = incrementedDateTime
               
 ############################################################################
@@ -132,12 +127,11 @@ runtimeData.currentIncrement = inputParams["dayoffsethours"]*60
 toolMode=inputParams["toolMode"]
 if toolMode == "develop" :
   runtimeData.activeSrcDirName = os.path.join(os.getcwd(),inputParams[toolMode]["srcDirName"])
-  runtimeData.activeTgtDirName = os.path.join(os.getcwd(),inputParams[toolMode]["tgtDirName"])
 else:
   runtimeData.activeSrcDirName = inputParams[toolMode]["srcDirName"]
-  runtimeData.activeTgtDirName = inputParams[toolMode]["tgtDirName"]
+runtimeData.activeTgtDirName = inputParams["tgtDirName"]
 
-# tbd chekci fi this is desirecd
+# TODO check if this is desired
 if os.path.exists(runtimeData.activeTgtDirName):
   shutil.rmtree(runtimeData.activeTgtDirName)
 
@@ -148,8 +142,8 @@ for Verz, VerzList, DateiListe in os.walk (runtimeData.activeSrcDirName):
         activeSrcCompleteFileName  = os.path.join(Verz,Datei)
         logging.debug(" acitveSrcCompleteFileName  = " + activeSrcCompleteFileName)
         if fnmatch.fnmatch(activeSrcCompleteFileName, inputParams["fileFilter"]):
-            #tgtCompleteFileName = findTGTFileName(activeSrcCompleteFileName, runtimeData.activeSrcDirName"],runtimeData.activeTgtDirName"])
-            processFile(activeSrcCompleteFileName, runtimeData.activeTgtDirName, inputParams["toolOptions"])
+            activeTgtCompleteFileName = findTGTFileName(activeSrcCompleteFileName, runtimeData.activeSrcDirName,runtimeData.activeTgtDirName)
+            processFile(activeSrcCompleteFileName, activeTgtCompleteFileName, inputParams["toolOptions"])
             
-print(("successfully transfered %s " % runtimeData.activeSrcDirName))
+logging.info(("successfully transfered %s " % runtimeData.activeSrcDirName))
 

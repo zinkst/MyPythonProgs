@@ -7,7 +7,6 @@ dayoffsethours: 7
 # Directories
 develop:
   srcDirName: "testdata/src"
-  tgtDirName: "testdata/tgt"
 production:
-  srcDirName: "/links/Photos/Converted/1920/2016"
-  tgtDirName: "/home/zinks/Pictures"
+  srcDirName: "/home/zinks/Photos_unsorted/1997 Neuseeland 11.12.96 - 1.2.97"
+tgtDirName: "/home/zinks/Photos_unsorted/IncrementExifTimeStamp"
