@@ -77,12 +77,18 @@ def processFile(activeSrcCompleteFileName, activeTgtCompleteFileName, toolOption
     
     # set DateTime Digitized to fileCreationDate
     fileCreationDate=datetime.fromtimestamp(os.path.getmtime(activeSrcCompleteFileName))
-    logging.debug( "fileCreationDate: %s of Image: %s" % (fileCreationDate, activeTgtCompleteFileName) )
-    metadata["Exif.Photo.DateTimeDigitized"]=fileCreationDate
+    try:
+      metadata["Exif.Photo.DateTimeDigitized"].raw_value
+    except KeyError: 
+      logging.debug( "fileCreationDate: %s of Image: %s" % (fileCreationDate, activeTgtCompleteFileName) )
+      metadata["Exif.Photo.DateTimeDigitized"]=fileCreationDate
     
     # copy comment to Image Title
-    comment=metadata["Exif.Photo.UserComment"].value
-    metadata["Xmp.dc.title"] = {'x-default': comment }
+    try:
+      metadata["Xmp.dc.title"].raw_value
+    except KeyError: 
+      comment=metadata["Exif.Photo.UserComment"].value
+      metadata["Xmp.dc.title"] = {'x-default': comment }
     
     # set new Creation Date 
     runtimeData.dateTimeOrig = metadata['Exif.Image.DateTime'].value
@@ -96,7 +102,7 @@ def processFile(activeSrcCompleteFileName, activeTgtCompleteFileName, toolOption
     incrementedDateTime = runtimeData.dateTimeOrig + timedelta(minutes=runtimeData.currentIncrement)
     metadata['Exif.Image.DateTime'].value = incrementedDateTime
     metadata['Exif.Photo.DateTimeOriginal'].value = incrementedDateTime
-    # The following doesn't work there need to use exiftool to set 
+    # The following doesn't work with pyeviv2 => need to use exiftool to set 
     # metadata['Exif.GPSInfo.GPSTimeStamp'].value = incrementedDateTime
     metadata.write()
     
