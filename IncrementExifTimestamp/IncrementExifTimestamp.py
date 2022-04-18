@@ -18,8 +18,9 @@ import logging.config
 import json
 import yaml
 import pyexiv2
+import shlex
+import subprocess
 
-#import dataTypes
 from dataTypes import RuntimeData
 
 ############################################################################
@@ -79,6 +80,10 @@ def processFile(activeSrcCompleteFileName, activeTgtCompleteFileName, toolOption
     logging.debug( "fileCreationDate: %s of Image: %s" % (fileCreationDate, activeTgtCompleteFileName) )
     metadata["Exif.Photo.DateTimeDigitized"]=fileCreationDate
     
+    # copy comment to Image Title
+    comment=metadata["Exif.Photo.UserComment"].value
+    metadata["Xmp.dc.title"] = {'x-default': comment }
+    
     # set new Creation Date 
     runtimeData.dateTimeOrig = metadata['Exif.Image.DateTime'].value
     if runtimeData.previousDateTime == datetime.fromtimestamp(0):
@@ -91,25 +96,30 @@ def processFile(activeSrcCompleteFileName, activeTgtCompleteFileName, toolOption
     incrementedDateTime = runtimeData.dateTimeOrig + timedelta(minutes=runtimeData.currentIncrement)
     metadata['Exif.Image.DateTime'].value = incrementedDateTime
     metadata['Exif.Photo.DateTimeOriginal'].value = incrementedDateTime
-    
-    # copy comment to Image Title
-    comment=metadata["Exif.Photo.UserComment"].value
-    metadata["Xmp.dc.title"] = {'x-default': comment }
-    
+    # The following doesn't work there need to use exiftool to set 
+    # metadata['Exif.GPSInfo.GPSTimeStamp'].value = incrementedDateTime
     metadata.write()
+    
+    setGPSTimeStamp(activeTgtCompleteFileName)
+
     os.utime(activeTgtCompleteFileName, (fileCreationDate.timestamp(), incrementedDateTime.timestamp()))
     runtimeData.previousDateTime = incrementedDateTime
-              
+
+############################################################################
+def setGPSTimeStamp(activeTgtCompleteFileName):
+    cmd=shlex.split("exiftool -P -m -overwrite_original \"-GPSTimeStamp<DateTimeOriginal\" \"-GPSDateStamp<DateTimeOriginal\"")
+    cmd.append(activeTgtCompleteFileName) 
+    result = subprocess.run(cmd,stdout=subprocess.PIPE,universal_newlines=True)
+    if result.returncode !=0:
+      logging.warning("Could not write GPSDateStamp for %s error %s" % (activeTgtCompleteFileName, result.stdout) )
+
+
 ############################################################################
 # main starts here
 # global variables
 
 
 rootLogger = initLogger()
-# if sys.platform == "win32":
-#   defaultEncoding="latin1"
-# else:
-#   defaultEncoding="UTF-8"
 
 if len(sys.argv) == 1 :
     print(description)
