@@ -7,6 +7,7 @@ it uses https://python3-exiv2.readthedocs.io/en/latest/tutorial.html as exif lib
 
 from datetime import timedelta
 from datetime import datetime
+from mimetypes import init
 import os
 import fnmatch
 import shutil
@@ -16,6 +17,7 @@ import string
 import logging
 import logging.config 
 import json
+from tabnanny import filename_only
 import yaml
 import pyexiv2
 import shlex
@@ -66,9 +68,44 @@ def initLogger():
     return rootLogger
 
 ###################################################################################################
+def setTimestampFromFilename(activeSrcCompleteFileName, activeTgtCompleteFileName, toolOptions):
+    shutil.copy2(activeSrcCompleteFileName,activeTgtCompleteFileName)
+    logging.info("Processing %s" %(os.path.basename(activeTgtCompleteFileName))) 
+    metadata = pyexiv2.ImageMetadata(activeTgtCompleteFileName)
+    # avaliable Tags see https://exiv2.org/tags.html
+    metadata.read() 
+    # /testdata/src/0731/dji_export_1659184032750.jpg
+    filename_only=os.path.basename(activeTgtCompleteFileName)
+    epochTimestamp=int(re.search(r"^dji_export_([0-9]*).jpg", filename_only).group(1))
+    fileTimestamp = datetime.fromtimestamp(epochTimestamp/1000.0)
+    metadata["Exif.Photo.DateTimeDigitized"]=fileTimestamp
+    metadata['Exif.Photo.DateTimeOriginal']=fileTimestamp
+    metadata['Exif.Image.DateTime']=fileTimestamp
+    metadata.write()
 
 ###########################################################################
-def processFile(activeSrcCompleteFileName, activeTgtCompleteFileName, toolOptions):
+def incrementTimestampFromFixedValue(activeSrcCompleteFileName, activeTgtCompleteFileName, toolOptions):
+    shutil.copy2(activeSrcCompleteFileName,activeTgtCompleteFileName)
+    logging.info("Processing %s" %(os.path.basename(activeTgtCompleteFileName))) 
+    metadata = pyexiv2.ImageMetadata(activeTgtCompleteFileName)
+    # avaliable Tags see https://exiv2.org/tags.html
+    metadata.read() 
+    initialTimestamp=datetime(2022, 8, 6, 9, 20,0)
+    if  runtimeData.previousDateTime == datetime(1970, 1, 1, 1, 0):
+      runtimeData.previousDateTime=initialTimestamp
+      runtimeData.currentIncrement=0  
+    else:
+      runtimeData.currentIncrement = inputParams["incrementMinutes"]
+    incrementedDateTime = runtimeData.previousDateTime + timedelta(minutes=runtimeData.currentIncrement)
+    metadata["Exif.Photo.DateTimeDigitized"]=incrementedDateTime
+    metadata['Exif.Photo.DateTimeOriginal']=incrementedDateTime
+    metadata['Exif.Image.DateTime']=incrementedDateTime
+    metadata.write()
+    os.utime(activeTgtCompleteFileName, (incrementedDateTime.timestamp(),incrementedDateTime.timestamp()))
+    runtimeData.previousDateTime=incrementedDateTime
+    
+###########################################################################
+def incrementTimestampFromMtime(activeSrcCompleteFileName, activeTgtCompleteFileName, toolOptions):
     shutil.copy2(activeSrcCompleteFileName,activeTgtCompleteFileName)
     logging.info("Processing %s" %(os.path.basename(activeTgtCompleteFileName))) 
     metadata = pyexiv2.ImageMetadata(activeTgtCompleteFileName)
@@ -77,21 +114,30 @@ def processFile(activeSrcCompleteFileName, activeTgtCompleteFileName, toolOption
     
     # set DateTime Digitized to fileCreationDate
     fileCreationDate=datetime.fromtimestamp(os.path.getmtime(activeSrcCompleteFileName))
-    try:
-      metadata["Exif.Photo.DateTimeDigitized"].raw_value
-    except KeyError: 
-      logging.debug( "fileCreationDate: %s of Image: %s" % (fileCreationDate, activeTgtCompleteFileName) )
-      metadata["Exif.Photo.DateTimeDigitized"]=fileCreationDate
-    
+    # try:
+    #   metadata["Exif.Photo.DateTimeDigitized"].raw_value
+    # except KeyError: 
+    #   logging.debug( "fileCreationDate: %s of Image: %s" % (fileCreationDate, activeTgtCompleteFileName) )
+    #   metadata["Exif.Photo.DateTimeDigitized"]=fileCreationDate
+    metadata["Exif.Photo.DateTimeDigitized"]=fileCreationDate
     # copy comment to Image Title
     try:
       metadata["Xmp.dc.title"].raw_value
     except KeyError: 
       comment=metadata["Exif.Photo.UserComment"].value
-      metadata["Xmp.dc.title"] = {'x-default': comment }
+      if comment != "":
+        metadata["Xmp.dc.title"] = {'x-default': comment }
     
     # set new Creation Date 
-    runtimeData.dateTimeOrig = metadata['Exif.Image.DateTime'].value
+    try: 
+      runtimeData.dateTimeOrig = metadata['Exif.Image.DateTime'].value
+    except KeyError: 
+      logging.warning("could not get Photo.DateTime for %s" % (activeTgtCompleteFileName))
+      try:
+        runtimeData.dateTimeOrig = metadata['Exif.Photo.DateTimeOriginal'].value
+      except KeyError: 
+        logging.warning("could not get Photo.DateTimeOriginal for %s" % (activeTgtCompleteFileName))
+        runtimeData.dateTimeOrig = fileCreationDate
     if runtimeData.previousDateTime == datetime.fromtimestamp(0):
       runtimeData.previousDateTime = runtimeData.dateTimeOrig
     if datetime.date(runtimeData.previousDateTime) == datetime.date(runtimeData.dateTimeOrig) :
@@ -100,13 +146,16 @@ def processFile(activeSrcCompleteFileName, activeTgtCompleteFileName, toolOption
       runtimeData.currentIncrement = inputParams["dayoffsethours"]*60
     logging.debug( "dateTime: %s of Image: %s" % (runtimeData.dateTimeOrig, activeTgtCompleteFileName) ) 
     incrementedDateTime = runtimeData.dateTimeOrig + timedelta(minutes=runtimeData.currentIncrement)
-    metadata['Exif.Image.DateTime'].value = incrementedDateTime
+    try:
+      metadata['Exif.Image.DateTime'].value = incrementedDateTime
+    except KeyError: 
+      logging.warning("could not set Photo.DateTime for %s" % (activeTgtCompleteFileName))
     metadata['Exif.Photo.DateTimeOriginal'].value = incrementedDateTime
     # The following doesn't work with pyeviv2 => need to use exiftool to set 
     # metadata['Exif.GPSInfo.GPSTimeStamp'].value = incrementedDateTime
     metadata.write()
     
-    setGPSTimeStamp(activeTgtCompleteFileName)
+    # setGPSTimeStamp(activeTgtCompleteFileName)
 
     os.utime(activeTgtCompleteFileName, (fileCreationDate.timestamp(), incrementedDateTime.timestamp()))
     runtimeData.previousDateTime = incrementedDateTime
@@ -119,6 +168,11 @@ def setGPSTimeStamp(activeTgtCompleteFileName):
     if result.returncode !=0:
       logging.warning("Could not write GPSDateStamp for %s error %s" % (activeTgtCompleteFileName, result.stdout) )
 
+###########################################################################
+def processFile(activeSrcCompleteFileName, activeTgtCompleteFileName, toolOptions):
+    incrementTimestampFromFixedValue(activeSrcCompleteFileName, activeTgtCompleteFileName, toolOptions)
+    #incrementTimestampFromMtime(activeSrcCompleteFileName, activeTgtCompleteFileName, toolOptions)
+    #setTimestampFromFilename(activeSrcCompleteFileName, activeTgtCompleteFileName, toolOptions)
 
 ############################################################################
 # main starts here

@@ -1,12 +1,12 @@
 toolMode: develop
-fileFilter: "*.jpg"
+fileFilter: "*.jpeg"
 #toolOptions: (preserveDirStructure|flat)
-toolOptions: flat
-incrementMinutes: 15
-dayoffsethours: 7
+toolOptions: preserveDirStructure
+incrementMinutes: 5
+dayoffsethours: 1
 # Directories
 develop:
   srcDirName: "testdata/src"
 production:
-  srcDirName: "/home/zinks/Photos_unsorted/1997 Neuseeland 11.12.96 - 1.2.97"
+  srcDirName: "/home/zinks/Photos_unsorted/2000 Westküste Amerika 22.7. - 1.10"
 tgtDirName: "/home/zinks/Photos_unsorted/IncrementExifTimeStamp"
