@@ -2,7 +2,7 @@
 description = """This program searches a given Source Directory for files and performs 
 a given operationThe reencoded files are stored under target directory
 preserving the directory structure. 
-it uses https://python3-exiv2.readthedocs.io/en/latest/tutorial.html as exif library
+it offers various options to compute the Image timestamp an uses https://python3-exiv2.readthedocs.io/en/latest/tutorial.html as exif library
 """
 
 from datetime import timedelta
@@ -68,7 +68,7 @@ def initLogger():
     return rootLogger
 
 ###################################################################################################
-def setTimestampFromFilename(activeSrcCompleteFileName, activeTgtCompleteFileName, toolOptions):
+def setTimestampFromDJIExportFilename(activeSrcCompleteFileName, activeTgtCompleteFileName, toolOptions):
     shutil.copy2(activeSrcCompleteFileName,activeTgtCompleteFileName)
     logging.info("Processing %s" %(os.path.basename(activeTgtCompleteFileName))) 
     metadata = pyexiv2.ImageMetadata(activeTgtCompleteFileName)
@@ -83,6 +83,30 @@ def setTimestampFromFilename(activeSrcCompleteFileName, activeTgtCompleteFileNam
     metadata['Exif.Image.DateTime']=fileTimestamp
     metadata.write()
 
+###################################################################################################
+def setTimestampFromWhatsAppFilename(activeSrcCompleteFileName, activeTgtCompleteFileName, toolOptions):
+    shutil.copy2(activeSrcCompleteFileName,activeTgtCompleteFileName)
+    logging.info("Processing %s" %(os.path.basename(activeTgtCompleteFileName))) 
+    metadata = pyexiv2.ImageMetadata(activeTgtCompleteFileName)
+    # avaliable Tags see https://exiv2.org/tags.html
+    metadata.read() 
+    # WhatsApp Image 2022-12-15 at 19.28.35.jpeg
+    filename_only=os.path.basename(activeTgtCompleteFileName)
+    rex1 = re.compile(r"^WhatsApp Image ([0-9-]*) at ([0-9.]*).jpeg")
+    reMatch = rex1.match(filename_only)
+    fileTSstr=reMatch.group(1) + " at " + reMatch.group(2) 
+    fileTimestamp = datetime.strptime(fileTSstr, "%Y-%m-%d at %H.%M.%S")
+    logging.debug( "fileTimestamp: %s" % (fileTimestamp) ) 
+    #fileTimestamp = datetime.fromtimestamp(epochTimestamp/1000.0)
+    metadata["Exif.Photo.DateTimeDigitized"]=fileTimestamp
+    metadata['Exif.Photo.DateTimeOriginal']=fileTimestamp
+    metadata['Exif.Image.Make']="WhatsApp"
+    metadata['Exif.Image.Model']="Import"
+    metadata
+    metadata.write()
+    os.utime(activeTgtCompleteFileName, (fileTimestamp.timestamp(),fileTimestamp.timestamp()))
+    
+   
 ###########################################################################
 def incrementTimestampFromFixedValue(activeSrcCompleteFileName, activeTgtCompleteFileName, toolOptions):
     shutil.copy2(activeSrcCompleteFileName,activeTgtCompleteFileName)
@@ -170,9 +194,10 @@ def setGPSTimeStamp(activeTgtCompleteFileName):
 
 ###########################################################################
 def processFile(activeSrcCompleteFileName, activeTgtCompleteFileName, toolOptions):
-    incrementTimestampFromFixedValue(activeSrcCompleteFileName, activeTgtCompleteFileName, toolOptions)
+    setTimestampFromWhatsAppFilename(activeSrcCompleteFileName, activeTgtCompleteFileName, toolOptions)
+    #incrementTimestampFromFixedValue(activeSrcCompleteFileName, activeTgtCompleteFileName, toolOptions)
     #incrementTimestampFromMtime(activeSrcCompleteFileName, activeTgtCompleteFileName, toolOptions)
-    #setTimestampFromFilename(activeSrcCompleteFileName, activeTgtCompleteFileName, toolOptions)
+    #setTimestampFromDJIExportFilename(activeSrcCompleteFileName, activeTgtCompleteFileName, toolOptions)
 
 ############################################################################
 # main starts here

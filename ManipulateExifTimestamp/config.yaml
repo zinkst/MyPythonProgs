@@ -1,4 +1,4 @@
-toolMode: develop
+toolMode: production
 fileFilter: "*.jpeg"
 #toolOptions: (preserveDirStructure|flat)
 toolOptions: preserveDirStructure
@@ -8,5 +8,5 @@ dayoffsethours: 1
 develop:
   srcDirName: "testdata/src"
 production:
-  srcDirName: "/home/zinks/Photos_unsorted/2000 Westküste Amerika 22.7. - 1.10"
-tgtDirName: "/home/zinks/Photos_unsorted/IncrementExifTimeStamp"
+  srcDirName: "/home/zinks/Photos_unsorted/WhatsAppImages/"
+tgtDirName: "/home/zinks/Photos_unsorted/WhatsAppImagesConverted/"
