@@ -1,5 +1,5 @@
 toolMode: production
-fileFilter: "*.pdf"
+fileFilter: "*.jpeg"
 #toolOptions: (preserveDirStructure|flat)
 toolOptions: preserveDirStructure
 incrementMinutes: 5
@@ -8,5 +8,5 @@ dayoffsethours: 1
 develop:
   srcDirName: "testdata/src"
 production:
-  srcDirName: "/home/zinks/Gemeinsam/Freizeit/Urlaube/2023/202308_Kattegatt Radtour/Komoot-tracks-printouts/"
-tgtDirName: "/home/zinks/Photos_unsorted/KomootPrintoursConverted/"
+  srcDirName: "/home/zinks/Photos_unsorted/WhatsAppImages/"
+tgtDirName: "/home/zinks/Photos_unsorted/WhatsAppImagesConverted/"

@@ -105,8 +105,45 @@ def setTimestampFromWhatsAppFilename(activeSrcCompleteFileName, activeTgtComplet
     metadata
     metadata.write()
     os.utime(activeTgtCompleteFileName, (fileTimestamp.timestamp(),fileTimestamp.timestamp()))
+
+#######################################################################################################    
+def setTimestampAndNameFromKomootPrintout(activeSrcCompleteFileName, activeTgtCompleteFileName, toolOptions):
+    shutil.copy2(activeSrcCompleteFileName,activeTgtCompleteFileName)
+    logging.info("Processing %s" %(os.path.basename(activeTgtCompleteFileName))) 
+    # 2023-08-13 Stukkamp - Scharbeutz _ Fahrradtour _ Komoot.pdf
+    # convertPDF2jjpeg
+    filename_only=os.path.basename(activeTgtCompleteFileName)
+    rex1 = re.compile(r"([0-9]{4})-([0-9]{2})-([0-9]{2}) (.*) _ Fahrradtour _ Komoot(.*)")
+    reMatch = rex1.match(filename_only)
     
-   
+    trackName=reMatch.group(4)
+    trackYear=reMatch.group(1)
+    trackMonth=reMatch.group(2)
+    trackDay=reMatch.group(3)
+    convertedTGTFileName=os.path.join(runtimeData.activeTgtDirName,trackYear+trackMonth+trackDay+"_000000"+"_"+trackName+".jpg")
+    cmdList=("convert",activeTgtCompleteFileName, convertedTGTFileName )
+    result = subprocess.run(cmdList,stdout=subprocess.PIPE,universal_newlines=True)
+    if result.returncode !=0:
+      logging.warning("Could convert %s error %s" % (activeTgtCompleteFileName, result.stdout) )
+    exit
+    
+    metadata = pyexiv2.ImageMetadata(convertedTGTFileName)
+    # avaliable Tags see https://exiv2.org/tags.html
+    metadata.read() 
+    metadata["Xmp.dc.title"] = {'x-default': trackName }
+    fileTSstr=trackYear+trackMonth+trackDay+"-000000"
+    fileTimestamp = datetime.strptime(fileTSstr, "%Y%m%d-%H%M%S")
+    logging.debug( "fileTimestamp: %s" % (fileTimestamp) ) 
+    #fileTimestamp = datetime.fromtimestamp(epochTimestamp/1000.0)
+    metadata["Exif.Photo.DateTimeDigitized"]=fileTimestamp
+    metadata['Exif.Photo.DateTimeOriginal']=fileTimestamp
+    metadata['Exif.Image.Make']="Komoot"
+    metadata['Exif.Image.Model']="Printout"
+    metadata
+    metadata.write()
+    os.utime(convertedTGTFileName, (fileTimestamp.timestamp(),fileTimestamp.timestamp()))
+
+
 ###########################################################################
 def incrementTimestampFromFixedValue(activeSrcCompleteFileName, activeTgtCompleteFileName, toolOptions):
     shutil.copy2(activeSrcCompleteFileName,activeTgtCompleteFileName)
@@ -114,7 +151,7 @@ def incrementTimestampFromFixedValue(activeSrcCompleteFileName, activeTgtComplet
     metadata = pyexiv2.ImageMetadata(activeTgtCompleteFileName)
     # avaliable Tags see https://exiv2.org/tags.html
     metadata.read() 
-    initialTimestamp=datetime(2022, 8, 6, 9, 20,0)
+    initialTimestamp=datetime(2023, 5, 6, 18, 0,0)
     if  runtimeData.previousDateTime == datetime(1970, 1, 1, 1, 0):
       runtimeData.previousDateTime=initialTimestamp
       runtimeData.currentIncrement=0  
@@ -194,10 +231,11 @@ def setGPSTimeStamp(activeTgtCompleteFileName):
 
 ###########################################################################
 def processFile(activeSrcCompleteFileName, activeTgtCompleteFileName, toolOptions):
-    setTimestampFromWhatsAppFilename(activeSrcCompleteFileName, activeTgtCompleteFileName, toolOptions)
+    #setTimestampFromWhatsAppFilename(activeSrcCompleteFileName, activeTgtCompleteFileName, toolOptions)
     #incrementTimestampFromFixedValue(activeSrcCompleteFileName, activeTgtCompleteFileName, toolOptions)
     #incrementTimestampFromMtime(activeSrcCompleteFileName, activeTgtCompleteFileName, toolOptions)
     #setTimestampFromDJIExportFilename(activeSrcCompleteFileName, activeTgtCompleteFileName, toolOptions)
+    setTimestampAndNameFromKomootPrintout(activeSrcCompleteFileName, activeTgtCompleteFileName, toolOptions)
 
 ############################################################################
 # main starts here
