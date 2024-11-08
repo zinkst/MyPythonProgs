@@ -63,7 +63,7 @@ def extractConfig(tasmotaMasterConfig, curUserConfig, tgtDir):
 # main starts here
 
 if len(sys.argv) == 1  :
-    configFile="/links/Not4Backup/shared/Nextcloud/Gemeinsam/Burghalde/HeimNetz/tasmota/tasmotaControl/generateConfigs_cfg.yml"
+    configFile="/links/Dokumente Marion Stefan/Burghalde/HeimNetz/tasmota/tasmotaControl/generateConfigs_cfg.yml"
 else:
     configFile = sys.argv[1]
 

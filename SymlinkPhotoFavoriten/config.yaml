@@ -18,12 +18,12 @@ develop:
     TGT-ROOT-DIR: /home/zinks/workspace/src/github.com/zinkst/MyPythonProgs/SymlinkPhotoFavoriten/testData
     SIMULATE: false
 production:
-    FAVORITES-SRC-DIR: "Favoriten/Compressed/Familie Zink/2001"
-    FAVORITES-TGT-DIR: "Favoriten/Symlinks/2001"
-    NOTFOUND_FILES_TGT_DIR: tgt/NotFoundFiles
+    FAVORITES-SRC-DIR: "Favoriten/Compressed/Familie Zink/2024"
+    FAVORITES-TGT-DIR: "Favoriten/Symlinks/2024"
+    NOTFOUND_FILES_TGT_DIR: Favoriten/Symlinks/NotFoundFiles
     # directories where Originale are searched
     ORIGINALS-DIRS: 
-        - Sammlung/2001
+        - Sammlung/2024
     SRC-ROOT-DIR: /links/Photos
     TGT-ROOT-DIR: /links/Photos
     SIMULATE: false

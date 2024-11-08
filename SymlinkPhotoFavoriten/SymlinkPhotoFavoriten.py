@@ -94,10 +94,10 @@ def createFileObjectsList(inputParams):
               logging.debug(FileObject.printOut(newFile))
               if newFile.foundOriginal == False:
                 notFoundFileObjects.append(newFile)
-                logging.info(newFile.findMethod.rjust(16) +" match found for: " + str(absCopiesOrigDateiName))
+                logging.debug(newFile.findMethod.rjust(16) +" match found for: " + str(absCopiesOrigDateiName))
               else:
                 fileObjects.append(newFile) 
-                logging.info(newFile.findMethod.rjust(16) + " match found for: " + str(absCopiesOrigDateiName))
+                logging.debug(newFile.findMethod.rjust(16) + " match found for: " + str(absCopiesOrigDateiName))
 #           else:     
 #                 logging.info("no".rjust(16) + " match found for: " + str(absCopiesOrigDateiName))
   return (fileObjects, notFoundFileObjects)
@@ -125,7 +125,7 @@ def processFileObjects(fileObjects,inputParams):
               logging.debug("checking os.symlink(" + newAbsLink + "," + fileObject.fileBaseName + ")")
               if  not os.path.exists(fileObject.fileBaseName):
                 #logging.debug("calling os.symlink(" + newRelLink + "," + fileObject.fileBaseName + ")")
-                logging.debug("calling os.link(" + newAbsLink + "," + fileObject.fileBaseName + ")")
+                logging.info("calling os.link(" + newAbsLink + "," + fileObject.fileBaseName + ")")
                 if inputParams["SIMULATE"] == False: 
                   # os.symlink(newRelLink,fileObject.fileBaseName)
                   if config['linkType'] == 'hard':
