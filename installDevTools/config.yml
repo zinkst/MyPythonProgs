@@ -1,0 +1,43 @@
+# loglevel: DEBUG
+loglevel: INFO
+# linkDir is a Dir in your PATH where a sysmbolic link to tthe tool is created
+linkDir: !ENV ${HOME}/.local/bin
+# installDir is the location where the different versions of the tool are installed
+installDir: !ENV ${HOME}/cliTools
+# in this dir the assets are downloaded
+downloadDir: !ENV ${HOME}/Downloads
+toolsToInstall:
+- goml
+- kubebuilder
+- kubectl
+- spruce
+- yq
+- kubectx
+- kubens
+- kind
+- aviator
+- calicoctl
+- kn
+- spotdl
+- hey
+- crane
+- golangci-lint
+- k9s
+- dyff
+- fly
+- helm
+- shift-report
+- havener
+- retry
+- stern
+- kubectl-neat
+- ko
+- yft
+- pack
+- pspblueprint
+- tsh
+- teleport
+- tctl
+- gosec
+- marp
+- bw

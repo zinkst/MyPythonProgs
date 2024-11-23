@@ -1,0 +1,149 @@
+tools:
+##################################################################
+### binary 
+- name: goml
+  version: latest # version: "0.9.0"
+  downloadUrl: https://github.com/herrjulz/goml/releases/download/v{{VERSION}}/goml-linux-amd64"
+  type: binary
+- name: kubebuilder
+  version: latest # version: 4.3.1
+  downloadUrl: https://github.com/kubernetes-sigs/kubebuilder/releases/download/v{{VERSION}}/kubebuilder_linux_amd64
+  type: binary
+- name: "kubectl"
+  version: "v1.30.4"
+  downloadUrl: "https://storage.googleapis.com/kubernetes-release/release/{{VERSION}}/bin/linux/amd64/kubectl"
+  type: binary
+- name: "spruce"
+  version: latest # version: "v1.29.0"
+  downloadUrl: "https://github.com/geofffranks/spruce/releases/download/v{{VERSION}}/spruce-linux-amd64"
+  type: binary
+- name: "yq"
+  version: latest # version: "v4.28.1"
+  downloadUrl: "https://github.com/mikefarah/yq/releases/download/v{{VERSION}}/yq_linux_amd64"
+  type: binary
+- name: "kind"
+  version: latest # version: "0.25.0"
+  downloadUrl: "https://github.com/kubernetes-sigs/kind/releases/download/v{{VERSION}}/kind-linux-amd64"
+  type: binary
+- name: "aviator"
+  version: latest # version: "1.9.0"
+  downloadUrl: "https://github.com/herrjulz/aviator/releases/download/v{{VERSION}}/aviator-linux-amd64"
+  type: binary
+- name: "calicoctl"
+  version: latest # version: "3.24.5"
+  downloadUrl: "https://github.com/projectcalico/calico/releases/download/v{{VERSION}}/calicoctl-linux-amd64"
+  type: binary
+- name: "kn"
+  version: latest # version: "1.9.2"
+  downloadUrl: "https://github.com/knative/client/releases/download/{{VERSION}}/kn-linux-amd64"
+  type: binary
+- name: "spotdl"
+  version: latest # version: "4.2.0"
+  downloadUrl: "https://github.com/spotDL/spotify-downloader/releases/download/v{{VERSION}}/spotdl-{{VERSION}}-linux"
+  type: binary
+- name: "hey"
+  version: "0.1.4"
+  downloadUrl: "https://hey-release.s3.us-east-2.amazonaws.com/hey_linux_amd64"
+  type: binary
+- name: "crane"
+  version: latest # version: "0.0.5"
+  downloadUrl: "https://github.com/migtools/crane/releases/download/v{{VERSION}}/amd64-linux-crane-v{{VERSION}}"
+  type: binary
+##################################################################
+### binary TGZ
+- name: "kubectx"
+  version: latest
+  downloadUrl: "https://github.com/ahmetb/kubectx/releases/download/v{{VERSION}}/kubectx_v{{VERSION}}_linux_x86_64.tar.gz"
+  type: binaryTgz
+- name: "kubens"
+  version: latest
+  downloadUrl: "https://github.com/ahmetb/kubectx/releases/download/v{{VERSION}}/kubens_v{{VERSION}}_linux_x86_64.tar.gz"
+  type: binaryTgz
+- name: "golangci-lint"
+  version: latest # version: "1.57.1"
+  downloadUrl: "https://github.com/golangci/golangci-lint/releases/download/v{{VERSION}}/golangci-lint-{{VERSION}}-linux-amd64.tar.gz"
+  binaryTarget: "golangci-lint-{{VERSION}}-linux-amd64/golangci-lint"
+  type: binaryTgz
+- name: "k9s"
+  version: latest # version: "0.32.5"
+  downloadUrl: "https://github.com/derailed/k9s/releases/download/v{{VERSION}}/k9s_Linux_amd64.tar.gz"
+  type: binaryTgz
+- name: "dyff"
+  version: latest # version: "1.5.6"
+  downloadUrl: "https://github.com/homeport/dyff/releases/download/v{{VERSION}}/dyff_{{VERSION}}_linux_amd64.tar.gz"
+  type: binaryTgz
+- name: "fly"
+  version: latest # version: "7.11.2"
+  downloadUrl: "https://github.com/concourse/concourse/releases/download/v{{VERSION}}/fly-{{VERSION}}-linux-amd64.tgz"
+  type: binaryTgz
+- name: "helm"
+  version: "3.10.3"
+  downloadUrl: "https://get.helm.sh/helm-v{{VERSION}}-linux-amd64.tar.gz"
+  binaryTarget: "linux-amd64/helm"
+  type: binaryTgz
+  # shift-report download URL doesn't work due to redirect
+- name: "shift-report"
+  version: "0.5.0"
+  downloadUrl: "https://github.ibm.com/ENCALADA/shift-report/releases/download/v{{VERSION}}/shift-report_{{VERSION}}_Linux_x86_64.tar.gz"
+  type: binaryTgz
+- name: "havener"
+  version: latest
+  downloadUrl: "https://github.com/homeport/havener/releases/download/v{{VERSION}}/havener_{{VERSION}}_linux_amd64.tar.gz"
+  type: binaryTgz
+- name: "retry"
+  version: latest # version: "0.1.3"
+  downloadUrl: "https://github.com/homeport/retry/releases/download/v{{VERSION}}/retry_{{VERSION}}_linux_amd64.tar.gz"
+  type: binaryTgz
+- name: "stern"
+  version: latest # version: "1.28.0"
+  downloadUrl: "https://github.com/stern/stern/releases/download/v{{VERSION}}/stern_{{VERSION}}_linux_amd64.tar.gz"
+  type: binaryTgz
+- name: "kubectl-neat"
+  version: latest # version: "2.0.3"
+  downloadUrl: "https://github.com/itaysk/kubectl-neat/releases/download/v{{VERSION}}/kubectl-neat_linux_amd64.tar.gz"
+  type: binaryTgz
+- name: "ko"
+  version: latest # version: "0.15.4"
+  downloadUrl: "https://github.com/ko-build/ko/releases/download/v{{VERSION}}/ko_Linux_x86_64.tar.gz"
+  type: binaryTgz
+- name: "yft"
+  version: latest # version: "1.0.6"
+  downloadUrl: "https://github.com/homeport/yft/releases/download/v{{VERSION}}/yft_{{VERSION}}_linux_amd64.tar.gz"
+  type: binaryTgz
+- name: "pack"
+  version: latest # version: "0.35.1"
+  downloadUrl: "https://github.com/buildpacks/pack/releases/download/v{{VERSION}}/pack-v{{VERSION}}-linux.tgz"
+  type: binaryTgz
+- name: "pspblueprint"
+  version: "0.2.0"
+  downloadUrl: "https://github.ibm.com/ENCALADA/pspblueprint/releases/download/v{{VERSION}}/pspblueprint_{{VERSION}}_Linux_x86_64.tar.gz"
+  type: binaryTgz
+- name: "tsh"
+  version: "13.4.14"
+  downloadUrl: "https://cdn.teleport.dev/teleport-v{{VERSION}}-linux-amd64-bin.tar.gz"
+  binaryTarget: "teleport/tsh"
+  type: binaryTgz
+- name: "teleport"
+  version: "13.4.14"
+  downloadUrl: "https://cdn.teleport.dev/teleport-v{{VERSION}}-linux-amd64-bin.tar.gz"
+  binaryTarget: "teleport/teleport"
+  type: binaryTgz
+- name: "tctl"
+  version: "13.4.14"
+  downloadUrl: "https://cdn.teleport.dev/teleport-v{{VERSION}}-linux-amd64-bin.tar.gz"
+  binaryTarget: "teleport/tctl"
+  type: binaryTgz
+- name: "gosec"
+  version: latest # version: "2.18.2"
+  downloadUrl: "https://github.com/securego/gosec/releases/download/v{{VERSION}}/gosec_{{VERSION}}_linux_amd64.tar.gz"
+  type: binaryTgz
+- name: "marp"
+  version: latest # version: "3.4.0"
+  downloadUrl: "https://github.com/marp-team/marp-cli/releases/download/v{{VERSION}}/marp-cli-v{{VERSION}}-linux.tar.gz"
+  type: binaryTgz
+###############################################################
+# zip
+- name: bw
+  version: latest
+  downloadUrl: https://github.com/bitwarden/cli/releases/download/v{{VERSION}}/bw-linux-{{VERSION}}.zip
+  type: zip
