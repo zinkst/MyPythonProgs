@@ -40,6 +40,7 @@ import argparse
 ############################################################################
 class InstallType(StrEnum):
     BINARY_TGZ = 'binaryTgz'
+    BINARY_XGZ = 'binaryXgz'
     BINARY = 'binary'
     ZIP = 'zip'
 
@@ -109,20 +110,23 @@ def install(toolConfig):
     else:
       logging.info("%s already downloaded from %s", toolFileName, url ) 
      
-  elif toolConfig["type"] == InstallType.BINARY_TGZ:
-    tgzFileName=toolFileName + ".tgz" 
-    if not os.path.exists(tgzFileName):
-      logging.info("downloading: " + url + " to: " + tgzFileName)
-      wget.download(url, tgzFileName)
+  elif toolConfig["type"] == InstallType.BINARY_TGZ or toolConfig["type"] == InstallType.BINARY_XGZ:
+    tarFileName=toolFileName + ".temp" 
+    if not os.path.exists(tarFileName):
+      logging.info("downloading: " + url + " to: " + tarFileName)
+      wget.download(url, tarFileName)
     else:
-      logging.info("%s already downloaded from %s", tgzFileName, url ) 
+      logging.info("%s already downloaded from %s", tarFileName, url )
     binaryName = Template(toolConfig.get("binaryTarget", toolConfig["name"])).render(VERSION=toolConfig["version"])
-    with tarfile.open(tgzFileName, 'r:gz') as tgzFile:
+    tarOpenOption = 'r:gz' # default is tgz
+    if toolConfig["type"] == InstallType.BINARY_XGZ:
+      tarOpenOption = 'r:xz' 
+    with tarfile.open(tarFileName, tarOpenOption) as tgzFile:
         toolBinaryFile = tgzFile.extractfile(binaryName)
         with open (toolFileName, "wb") as outfile:
             outfile.write(toolBinaryFile.read())
-    os.remove(tgzFileName)
-  
+    os.remove(tarFileName)
+
   elif toolConfig["type"] == InstallType.ZIP:
     zipFileName=toolFileName + ".zip" 
     if not os.path.exists(zipFileName):

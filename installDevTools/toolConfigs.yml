@@ -135,6 +135,13 @@ tools:
   type: binaryTgz
 ###############################################################
 # zip
+- name: "jnv"
+  version: latest # version: "3.4.0"
+  downloadUrl: "https://github.com/ynqa/jnv/releases/download/v{{VERSION}}/jnv-x86_64-unknown-linux-gnu.tar.xz"
+  type: binaryXgz
+  binaryTarget: jnv-x86_64-unknown-linux-gnu/jnv
+###############################################################
+# zip
 - name: bw
   version: latest
   downloadUrl: https://github.com/bitwarden/cli/releases/download/v{{VERSION}}/bw-linux-{{VERSION}}.zip
