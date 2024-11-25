@@ -5,6 +5,7 @@ tools:
   version: latest # version: "0.9.0"
   downloadUrl: https://github.com/herrjulz/goml/releases/download/v{{VERSION}}/goml-linux-amd64"
   type: binary
+  # currently doesn't work url gives 404 in python although it is correct
 - name: kubebuilder
   version: latest # version: 4.3.1
   downloadUrl: https://github.com/kubernetes-sigs/kubebuilder/releases/download/v{{VERSION}}/kubebuilder_linux_amd64
@@ -60,7 +61,7 @@ tools:
   downloadUrl: "https://github.com/ahmetb/kubectx/releases/download/v{{VERSION}}/kubens_v{{VERSION}}_linux_x86_64.tar.gz"
   type: binaryTgz
 - name: "golangci-lint"
-  version: latest # version: "1.57.1"
+  version: "1.62.0"
   downloadUrl: "https://github.com/golangci/golangci-lint/releases/download/v{{VERSION}}/golangci-lint-{{VERSION}}-linux-amd64.tar.gz"
   binaryTarget: "golangci-lint-{{VERSION}}-linux-amd64/golangci-lint"
   type: binaryTgz
@@ -80,11 +81,6 @@ tools:
   version: "3.10.3"
   downloadUrl: "https://get.helm.sh/helm-v{{VERSION}}-linux-amd64.tar.gz"
   binaryTarget: "linux-amd64/helm"
-  type: binaryTgz
-  # shift-report download URL doesn't work due to redirect
-- name: "shift-report"
-  version: "0.5.0"
-  downloadUrl: "https://github.ibm.com/ENCALADA/shift-report/releases/download/v{{VERSION}}/shift-report_{{VERSION}}_Linux_x86_64.tar.gz"
   type: binaryTgz
 - name: "havener"
   version: latest
@@ -113,10 +109,6 @@ tools:
 - name: "pack"
   version: latest # version: "0.35.1"
   downloadUrl: "https://github.com/buildpacks/pack/releases/download/v{{VERSION}}/pack-v{{VERSION}}-linux.tgz"
-  type: binaryTgz
-- name: "pspblueprint"
-  version: "0.2.0"
-  downloadUrl: "https://github.ibm.com/ENCALADA/pspblueprint/releases/download/v{{VERSION}}/pspblueprint_{{VERSION}}_Linux_x86_64.tar.gz"
   type: binaryTgz
 - name: "tsh"
   version: "13.4.14"

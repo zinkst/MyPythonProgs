@@ -4,8 +4,6 @@ loglevel: INFO
 linkDir: !ENV ${HOME}/.local/bin
 # installDir is the location where the different versions of the tool are installed
 installDir: !ENV ${HOME}/cliTools
-# in this dir the assets are downloaded
-downloadDir: !ENV ${HOME}/Downloads
 toolsToInstall:
 - goml
 - kubebuilder
@@ -26,7 +24,6 @@ toolsToInstall:
 - dyff
 - fly
 - helm
-- shift-report
 - havener
 - retry
 - stern
@@ -34,7 +31,6 @@ toolsToInstall:
 - ko
 - yft
 - pack
-- pspblueprint
 - tsh
 - teleport
 - tctl

@@ -2,7 +2,17 @@
 # -*- coding: utf-8 -*-
 
 description = """
-This tool installs tools (mostly cli) directly from github
+This tool installs tools (mostly cli) directly from github.
+It requires a config for each tool in toolConfigs.yml 
+Option:
+
+* You can install a specific tool with the -t <toolName>
+* without options it will try to get the latest release from all tools specified in config.yml (toolsToInstall list)
+
+## required Python modules
+```bash 
+pip install wget jinja2 pyaml-env
+```  
 """
 
 import os
@@ -70,7 +80,11 @@ def setVersion(toolConfig):
   releasesUrl="https://api."+repoHost+"/repos/"+repoOrg+"/" + repoName+ "/releases/latest"
   logging.info("releasesUrl: %s " , releasesUrl)
   
-  response = requests.get(releasesUrl)
+  try:
+    response = requests.get(releasesUrl)
+  except requests.exceptions.RequestException as e:  
+    raise SystemExit(e)
+
   version=response.json()["tag_name"]
   if version.startswith('v'): 
      version=version[1:]
@@ -102,7 +116,7 @@ def install(toolConfig):
       wget.download(url, tgzFileName)
     else:
       logging.info("%s already downloaded from %s", tgzFileName, url ) 
-    binaryName = toolConfig.get("binaryTarget", toolConfig["name"])
+    binaryName = Template(toolConfig.get("binaryTarget", toolConfig["name"])).render(VERSION=toolConfig["version"])
     with tarfile.open(tgzFileName, 'r:gz') as tgzFile:
         toolBinaryFile = tgzFile.extractfile(binaryName)
         with open (toolFileName, "wb") as outfile:
