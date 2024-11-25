@@ -3,9 +3,8 @@ tools:
 ### binary 
 - name: goml
   version: latest # version: "0.9.0"
-  downloadUrl: https://github.com/herrjulz/goml/releases/download/v{{VERSION}}/goml-linux-amd64"
+  downloadUrl: "https://github.com/herrjulz/goml/releases/download/v{{VERSION}}/goml-linux-amd64"
   type: binary
-  # currently doesn't work url gives 404 in python although it is correct
 - name: kubebuilder
   version: latest # version: 4.3.1
   downloadUrl: https://github.com/kubernetes-sigs/kubebuilder/releases/download/v{{VERSION}}/kubebuilder_linux_amd64

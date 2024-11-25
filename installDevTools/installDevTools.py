@@ -94,7 +94,7 @@ def setVersion(toolConfig):
 
 ############################################################################
 def install(toolConfig):
-  logging.info("Installing tool: " + toolConfig["name"])
+  logging.debug("Installing tool: " + toolConfig["name"])
   installDir=os.path.join(config["installDir"], str(toolConfig["name"]+"-versions"))
   os.makedirs(installDir, exist_ok=True)
   toolFileName=os.path.join(installDir,str(toolConfig["name"]+"-"+toolConfig["version"]))
@@ -145,11 +145,11 @@ def install(toolConfig):
   toolLinkName=os.path.join(config["linkDir"],str(toolConfig["name"]))
   if os.path.exists(toolLinkName):
     os.remove(toolLinkName)
-  os.symlink(toolFileName,toolLinkName)  
+  os.symlink(toolFileName,toolLinkName)
+  updatedTools.append( {toolConfig["name"], toolConfig["version"]})  
+  print() # add newline for better log output
   
- 
-
-############################################################################
+ ############################################################################
 # main starts here
 
 defaultConfigFileName = os.path.join(os.environ["HOME"], ".config/installDevTools/config.yml")
@@ -171,10 +171,12 @@ if args.toolToInstall:
   config["toolsToInstall"] = [ args.toolToInstall ]
 logging.info("toolsToInstall: " + pprint.pformat(config["toolsToInstall"], indent=2,depth=3))
 logging.debug("ToolConfigs:\n %s",  pprint.pformat(toolConfigs, indent=2,depth=3))
+
+updatedTools = []
 for toolName in config["toolsToInstall"]:
   toolConfig = getToolsConfig(toolConfigs, toolName)
   setVersion(toolConfig)
   install(toolConfig)
 
-logging.info("Finished installing tools: " + pprint.pformat(config["toolsToInstall"], indent=2,depth=3))
+logging.info("Finished \nThe following tools were updated: %s ", str(updatedTools))
 
