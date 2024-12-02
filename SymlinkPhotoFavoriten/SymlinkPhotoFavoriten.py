@@ -25,9 +25,7 @@ import yaml
 import shutil
 from FileObject import FileObject
 import time,datetime
-#efrom functions import initLogger
-# import scriptutil as SU
-    
+import argparse    
 
 def initLogger(config):
     handler = logging.StreamHandler(sys.stdout)
@@ -170,22 +168,16 @@ def processNotFoundFiles(notFoundFileObjects):
 ############################################################################
 # main starts here
 
-if len(sys.argv) == 1 :
-    print(description)
-    print(sys.argv[0] + "<configfile>")
-    configFileName = 'config.yaml'
-else:
-    configFileName = sys.argv[1]
+defaultConfigFileName = os.path.join(os.environ["HOME"], ".config/SymlinkPhotoFavoriten/config.yml")
 
+parser = argparse.ArgumentParser()
+parser.add_argument("-c", "--configFileName", type=str, nargs='?', default=defaultConfigFileName, help="path to config file")
+args = parser.parse_args()  
+print(args)
 
-with open(configFileName, 'r',encoding='utf-8') as cfgfile:
+with open(args.configFileName, 'r',encoding='utf-8') as cfgfile:
     config = yaml.safe_load(cfgfile)
 logger = initLogger(config)
-
-#yamlFileName = 'SearchAndCopyFileFromOriginalDir_Photos.yaml'
-#with open(yamlFileName, 'w', encoding='utf-8') as outFile:
-#   outFile.write(yaml.dump(config))
-#exit(0)       
 
 configuration = config["configuration"]  
 inputParams = config[configuration]
