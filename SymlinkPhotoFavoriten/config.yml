@@ -1,14 +1,16 @@
-# use production or development config
+# use production or develop config
 configuration: production
 # create hardlinks or soft links
 # valid values [ hard , soft ]
 linkType: soft
+# valid values [ relative , absolute ] create relative path links
+linkTarget: relative
 loglevel: INFO
 # extension of files which are used in search (case insensitive)
-searchExtension: [jpg, jpeg]
+searchExtension: [jpg, jpeg, png]
 develop:
     # directory where files are from which the originals are to be searched
-    FAVORITES-SRC-DIR: Photos/Converted
+    FAVORITES-SRC-DIR: Photos/Favoriten/Compressed
     FAVORITES-TGT-DIR: tgt/Favoriten
     NOTFOUND_FILES_TGT_DIR: tgt/NotFoundFiles
     # directories where Originale are searched
@@ -18,12 +20,12 @@ develop:
     TGT-ROOT-DIR: /home/zinks/workspace/src/github.com/zinkst/MyPythonProgs/SymlinkPhotoFavoriten/testData
     SIMULATE: false
 production:
-    FAVORITES-SRC-DIR: "Favoriten/Compressed/Familie Zink/2024"
-    FAVORITES-TGT-DIR: "Favoriten/Symlinks/2024"
-    NOTFOUND_FILES_TGT_DIR: Favoriten/Symlinks/NotFoundFiles
+    FAVORITES-SRC-DIR: "Favoriten/Compressed/Familie Zink"
+    FAVORITES-TGT-DIR: "Favoriten/Symlinks"
+    NOTFOUND_FILES_TGT_DIR: Favoriten/RelSymlinks/NotFoundFiles
     # directories where Originale are searched
     ORIGINALS-DIRS: 
-        - Sammlung/2024
+        - Sammlung
     SRC-ROOT-DIR: /links/Photos
     TGT-ROOT-DIR: /links/Photos
     SIMULATE: false

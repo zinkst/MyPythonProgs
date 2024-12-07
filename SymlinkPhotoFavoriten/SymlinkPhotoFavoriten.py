@@ -41,9 +41,15 @@ def initLogger(config):
 
 
 ###########################################################################
-def extendInputParams(inputParams):
+def extendInputParams(inputParams, year):
   inputParams["ABS-FAVORITES-SRC-DIR"] = os.path.join(inputParams["SRC-ROOT-DIR"], inputParams["FAVORITES-SRC-DIR"])
   inputParams["ABS-FAVORITES-TGT-DIR"] = os.path.join(inputParams["TGT-ROOT-DIR"], inputParams["FAVORITES-TGT-DIR"])
+  if year != "":
+    inputParams["ABS-FAVORITES-SRC-DIR"] = os.path.join(inputParams["ABS-FAVORITES-SRC-DIR"], year)
+    inputParams["ABS-FAVORITES-TGT-DIR"] = os.path.join(inputParams["ABS-FAVORITES-TGT-DIR"], year)
+    # if only one Originals Dir is specifed then add year
+    if len(inputParams["ORIGINALS-DIRS"]) == 1:
+       inputParams["ORIGINALS-DIRS"][0]=os.path.join(inputParams["ORIGINALS-DIRS"][0], year)
   inputParams["SRC-ROOT-DIR_LENGTH"] = len(inputParams["SRC-ROOT-DIR"])
   inputParams["TGT-ROOT-DIR_LENGTH"] = len(inputParams["TGT-ROOT-DIR"])
   logging.debug("extended inputParams = \n%s" % inputParams) 
@@ -113,23 +119,32 @@ def processFileObjects(fileObjects,inputParams):
                   if inputParams["SIMULATE"] == False: 
                       os.makedirs(newTgtDir)  # ,'0775')
                 
-              logging.debug("calling os.chdir(" + newTgtDir + ")")
-              if inputParams["SIMULATE"] == False: 
-                os.chdir(newTgtDir)
+            #   logging.debug("calling os.chdir(" + newTgtDir + ")")
+            #   if inputParams["SIMULATE"] == False: 
+            #     os.chdir(newTgtDir)
               
-              #newRelLink = os.path.join("../"*fileObject.copiesLinkDepthToBaseDir, fileObject.dateiNameOnOriginalRelativeToRootDir)
-              #logging.debug("checking os.symlink(" + newRelLink + "," + fileObject.fileBaseName + ")")
+              newRelLink = os.path.join("../"*fileObject.copiesLinkDepthToBaseDir, fileObject.dateiNameOnOriginalRelativeToRootDir)
+              logging.debug("checking os.symlink(" + newRelLink + "," + fileObject.fileBaseName + ")")
               newAbsLink = os.path.join(fileObject.ip['TGT-ROOT-DIR'], fileObject.dateiNameOnOriginalRelativeToRootDir)
               logging.debug("checking os.symlink(" + newAbsLink + "," + fileObject.fileBaseName + ")")
-              if  not os.path.exists(fileObject.fileBaseName):
-                #logging.debug("calling os.symlink(" + newRelLink + "," + fileObject.fileBaseName + ")")
-                logging.info("calling os.link(" + newAbsLink + "," + fileObject.fileBaseName + ")")
+              tgtFileName = os.path.join(newTgtDir,fileObject.fileBaseName)
+              if  not os.path.exists(tgtFileName):
+                logging.info("file " + tgtFileName + " does not exit - creating ...")
                 if inputParams["SIMULATE"] == False: 
-                  # os.symlink(newRelLink,fileObject.fileBaseName)
-                  if config['linkType'] == 'hard':
-                      os.link(newAbsLink, fileObject.fileBaseName)
+                  if config['linkTarget'] == 'absolute':
+                    if config['linkType'] == 'hard':
+                        logging.info("calling os.link(" + newAbsLink + "," + tgtFileName + ")")
+                        os.link(newAbsLink, tgtFileName)
+                    else:
+                        logging.info("calling os.symlink(" + newAbsLink + "," + tgtFileName + ")")
+                        os.symlink(newAbsLink, tgtFileName)  
                   else:
-                      os.symlink(newAbsLink, fileObject.fileBaseName)  
+                    if config['linkType'] == 'hard':
+                        logging.info("calling os.link(" + newRelLink + "," + tgtFileName + ")")
+                        os.link(newRelLink, tgtFileName)
+                    else:
+                        logging.info("calling os.symlink(" + newRelLink + "," + tgtFileName + ")")
+                        os.symlink(newRelLink, tgtFileName)  
                       
           except (OSError,IOError):
               logging.error("error in processing " + fileObject.printOut())
@@ -172,6 +187,7 @@ defaultConfigFileName = os.path.join(os.environ["HOME"], ".config/SymlinkPhotoFa
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-c", "--configFileName", type=str, nargs='?', default=defaultConfigFileName, help="path to config file")
+parser.add_argument("-y", "--year", type=str, nargs='?', default="2024", help="year to proccess")
 args = parser.parse_args()  
 print(args)
 
@@ -181,7 +197,7 @@ logger = initLogger(config)
 
 configuration = config["configuration"]  
 inputParams = config[configuration]
-inputParams = extendInputParams(inputParams)
+inputParams = extendInputParams(inputParams, args.year)
 
 begin = datetime.datetime.now()
 beginFormatted = begin.strftime('%Y-%m-%d %H:%M:%S')
