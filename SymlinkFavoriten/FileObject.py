@@ -82,7 +82,7 @@ class FileObject:
     self.copiesPathRelativeToRootDir=self.absCopiesOrigDateiName[self.ip["SRC-ROOT-DIR_LENGTH"]+1:]          
     self.copiesDirRelativeToRootDir=os.path.dirname(self.copiesPathRelativeToRootDir)
     lengthCopiesOrigDir= len(self.ip['FAVORITES-SRC-DIR'])
-    self.copiesLinkDepthToBaseDir=self.copiesDirRelativeToRootDir.count(os.sep)
+    self.copiesLinkDepthToBaseDir=self.copiesDirRelativeToRootDir.count(os.sep)+inputParams["FAVORITES-TGT-DIR"].count(os.sep)-1
           
     if found == True:  
       self.dateiNameOnOriginalRelativeToRootDir=self.absDateiNameOnOriginal[self.ip["SRC-ROOT-DIR_LENGTH"]+1:]

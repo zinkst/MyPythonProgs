@@ -1,11 +1,9 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-description = """This program handles handles directories with favorite Photos and creates a directory with absolute links to the original file
-if found on the originals dir  
-
-SymlinkFavoriten.py <option> [<xml_configfile>]
-
+description = """
+This program handles handles directories with favorite Photos or Videos and creates 
+a directory with absolute or relative links to the original file if found on the originals dir  
 """
 
 import os
@@ -62,11 +60,11 @@ def createFileObjectsList(inputParams):
   originalFilesDict = {}
   # create searchPattern from extensions
   searchPattern = r"("
-  for i in range (0,len(config['searchExtension'])):
+  for i in range (0,len(typeConfiguration['searchExtension'])):
       if i == 0:
-          searchPattern = searchPattern + "." + config['searchExtension'][i] 
+          searchPattern = searchPattern + "." + typeConfiguration['searchExtension'][i] 
       else:
-          searchPattern = searchPattern + "|" + "." + config['searchExtension'][i]
+          searchPattern = searchPattern + "|" + "." + typeConfiguration['searchExtension'][i]
   searchPattern = searchPattern + ")"    
   logging.info("searchPattern :" + searchPattern )
       
@@ -131,15 +129,15 @@ def processFileObjects(fileObjects,inputParams):
               if  not os.path.exists(tgtFileName):
                 logging.info("file " + tgtFileName + " does not exit - creating ...")
                 if inputParams["SIMULATE"] == False: 
-                  if config['linkTarget'] == 'absolute':
-                    if config['linkType'] == 'hard':
+                  if typeConfiguration['linkTarget'] == 'absolute':
+                    if typeConfiguration['linkType'] == 'hard':
                         logging.info("calling os.link(" + newAbsLink + "," + tgtFileName + ")")
                         os.link(newAbsLink, tgtFileName)
                     else:
                         logging.info("calling os.symlink(" + newAbsLink + "," + tgtFileName + ")")
                         os.symlink(newAbsLink, tgtFileName)  
                   else:
-                    if config['linkType'] == 'hard':
+                    if typeConfiguration['linkType'] == 'hard':
                         logging.info("calling os.link(" + newRelLink + "," + tgtFileName + ")")
                         os.link(newRelLink, tgtFileName)
                     else:
@@ -183,11 +181,12 @@ def processNotFoundFiles(notFoundFileObjects):
 ############################################################################
 # main starts here
 
-defaultConfigFileName = os.path.join(os.environ["HOME"], ".config/SymlinkPhotoFavoriten/config.yml")
+defaultConfigFileName = os.path.join(os.environ["HOME"], ".config/SymlinkFavoriten/config.yml")
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-c", "--configFileName", type=str, nargs='?', default=defaultConfigFileName, help="path to config file")
 parser.add_argument("-y", "--year", type=str, nargs='?', default="2024", help="year to proccess")
+parser.add_argument("-t", "--type", type=str, nargs='?', default="photos", help="filetype to proccess")
 args = parser.parse_args()  
 print(args)
 
@@ -195,8 +194,12 @@ with open(args.configFileName, 'r',encoding='utf-8') as cfgfile:
     config = yaml.safe_load(cfgfile)
 logger = initLogger(config)
 
-configuration = config["configuration"]  
-inputParams = config[configuration]
+if args.type == "videos":
+  typeConfiguration = config["videos"]
+else:
+  typeConfiguration = config["photos"]
+       
+inputParams = config[args.type][typeConfiguration["configuration"]]
 inputParams = extendInputParams(inputParams, args.year)
 
 begin = datetime.datetime.now()
