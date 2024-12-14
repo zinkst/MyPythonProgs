@@ -1,7 +1,9 @@
 loglevel: INFO
+# loglevel: DEBUG
 photos:
   # use production or develop config
-  configuration: develop
+  # configuration: develop
+  configuration: production
   # create hardlinks or soft links
   # valid values [ hard , soft ]
   linkType: soft
@@ -11,10 +13,10 @@ photos:
   searchExtension: [jpg, jpeg, png]
   develop:
     # directory where files are from which the originals are to be searched
-    SRC-ROOT-DIR: /home/zinks/workspace/src/github.com/zinkst/MyPythonProgs/SymlinkFavoriten/testData
+    SRC-ROOT-DIR: /home/zinks/workspace/testdata_myprg/SymlinkFavoriten
     FAVORITES-SRC-DIR: Photos/Favoriten/Compressed
     # Target Directory where symlinks are stored
-    TGT-ROOT-DIR: /home/zinks/workspace/src/github.com/zinkst/MyPythonProgs/SymlinkFavoriten/testData
+    TGT-ROOT-DIR: /home/zinks/workspace/testdata_myprg/SymlinkFavoriten
     FAVORITES-TGT-DIR: tgt/Favoriten
     NOTFOUND_FILES_TGT_DIR: tgt/NotFoundFiles
     # directories where Originale are searched
@@ -45,25 +47,27 @@ videos:
   searchExtension: [mkv, mp4, mpeg]
   develop:
     # directory where files are from which the originals are to be searched
-    SRC-ROOT-DIR: /home/zinks/workspace/src/github.com/zinkst/MyPythonProgs/SymlinkFavoriten/testData
-    FAVORITES-SRC-DIR: Photos/Favoriten/Compressed
+    SRC-ROOT-DIR: /home/zinks/workspace/testdata_myprg/SymlinkFavoriten/FamilienVideos
+    FAVORITES-SRC-DIR: Favoriten-Familie-Zink-Videos
     # Target Directory where symlinks are stored
-    TGT-ROOT-DIR: /home/zinks/workspace/src/github.com/zinkst/MyPythonProgs/SymlinkFavoriten/testData
-    FAVORITES-TGT-DIR: tgt/Favoriten
-    NOTFOUND_FILES_TGT_DIR: tgt/NotFoundFiles
+    TGT-ROOT-DIR: /home/zinks/workspace/testdata_myprg/SymlinkFavoriten/FamilienVideos
+    FAVORITES-TGT-DIR: Symlinks-Favoriten
+    FAVORITES-TGT-COMPRESSED-DIR: FamilienVideos-für-Handy
+    NOTFOUND_FILES_TGT_DIR: NotFoundFiles
     # directories where Originale are searched
     ORIGINALS-DIRS: 
-        - Photos/Sammlung
+        - Familie-Zink-Videos
     SIMULATE: false
   production:
     # directory where files are from which the originals are to be searched
-    SRC-ROOT-DIR: /links/Photos
-    FAVORITES-SRC-DIR: "Favoriten/Compressed/Familie Zink"
+    SRC-ROOT-DIR: /links/FamilienVideos
+    FAVORITES-SRC-DIR: "Favoriten-Familie-Zink-Videos"
     # Target Directory where symlinks are stored
-    TGT-ROOT-DIR: /links/Photos
-    FAVORITES-TGT-DIR: "Favoriten/Symlinks/Familie Zink"
-    NOTFOUND_FILES_TGT_DIR: Favoriten/Symlinks/NotFoundFiles
+    TGT-ROOT-DIR: /links/FamilienVideos
+    FAVORITES-TGT-DIR: "Favoriten-Familie-Zink-Videos"
+    FAVORITES-TGT-COMPRESSED-DIR: FamilienVideos-für-Handy
+    NOTFOUND_FILES_TGT_DIR: NotFoundFiles
     # directories where Originale are searched
     ORIGINALS-DIRS: 
-        - Sammlung
+        - Familie-Zink-Videos
     SIMULATE: false

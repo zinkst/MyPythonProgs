@@ -1,38 +1,38 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+from gi.repository import GExiv2
 import sys
 import string
 import logging
-import logging.config 
+import logging.config
 import os
 import re
-import time,datetime
+import time
+import datetime
 
 import gi
 gi.require_version('GExiv2', '0.10')
-from gi.repository import GExiv2
-   
 
-    
+
 class FileObject:
   ip = {}
   # keys :
   # ROOT-DIR ,ORIGINALS-DIR,ABS-FAVORITES-TGT-DIR,FAVORITES-TGT-DIR,FAVORITES-SRC-DIR,ABS-ORIGINALS-DIR,ABS-FAVORITES-SRC-DIR'}
   absCopiesOrigDateiName = u""
-  fileBaseName    = u""
+  fileBaseName = u""
   fileId = u""
   absDateiNameOnOriginal = u""
-  copiesPathRelativeToRootDir = u"" 
+  copiesPathRelativeToRootDir = u""
   copiesDirRelativeToRootDir = u""
-  copiesTgtDirRelativeToRootDir=u""
+  copiesTgtDirRelativeToRootDir = u""
   copiesLinkDepthToBaseDir = 0
   dateiNameOnOriginalRelativeToRootDir = u""
   directoryNameOnOriginalRelativeToRootDir = u""
-  exifDateTimeString = None
+  # exifDateTimeString = None
   foundOriginal = False
   findMethod = "no"
-   
+
   def printOut(self):
     output = "\r\nfileBaseName = " + self.fileBaseName + \
              "\r\nabsCopiesOrigDateiName = " + self.absCopiesOrigDateiName + \
@@ -43,67 +43,70 @@ class FileObject:
              "\r\nabsDateiNameOnOriginal = " + self.absDateiNameOnOriginal + \
              "\r\ndateiNameOnOriginalRelativeToRootDir = " + self.dateiNameOnOriginalRelativeToRootDir + \
              "\r\ndirectoryNameOnOriginalRelativeToRootDir = " + self.directoryNameOnOriginalRelativeToRootDir + \
-             "\r\nexifDateTimeString = " + str(self.exifDateTimeString) + \
              "\r\nfindMethod = " + self.findMethod + \
              "\r\nfoundOriginal = " + str(self.foundOriginal) + \
              "\r\nfileId = " + self.fileId + \
              "\r\n"
+    #  "\r\nexifDateTimeString = " + str(self.exifDateTimeString) + \
     return output
-  
 
   def getDateTimeStringFromExif(absDateiName):
-      retVal = None
-      try:
-          src_exif = GExiv2.Metadata(absDateiName)
-          exifDateTime = src_exif['Exif.Photo.DateTimeOriginal']
-          if exifDateTime is not None:
-              #Python 3
-              trantab = str.maketrans({'_':'', ' ':'', ':':''})
-              retVal = exifDateTime.translate(trantab)
-      except KeyError:
-          logging.debug("Image " + absDateiName + " does not have exiv date time")
-      except:
-          logging.debug("Fatal error " + absDateiName + " does not have exiv date time")
-      return retVal 
+    retVal = None
+    try:
+      src_exif = GExiv2.Metadata(absDateiName)
+      exifDateTime = src_exif['Exif.Photo.DateTimeOriginal']
+      if exifDateTime is not None:
+        # Python 3
+        trantab = str.maketrans({'_': '', ' ': '', ':': ''})
+        retVal = exifDateTime.translate(trantab)
+    except KeyError:
+      logging.debug("Image " + absDateiName + " does not have exiv date time")
+    except:
+      logging.debug("Fatal error " + absDateiName + " does not have exiv date time")
+    return retVal
 
-  def initialize(self,inputParams,in_absCopiesOrigDateiName, originalFilesDict):
+  def initialize(self, inputParams, in_absCopiesOrigDateiName, originalFilesDict):
     self.ip = inputParams
     self.absCopiesOrigDateiName = in_absCopiesOrigDateiName
     self.fileBaseName = os.path.basename(self.absCopiesOrigDateiName)
-    self.fileId = self.fileBaseName.rsplit('_',1)[0]
-    found = False 
-    self.exifDateTimeString = FileObject.getDateTimeStringFromExif(self.absCopiesOrigDateiName)
+    self.fileId = self.fileBaseName.rsplit('_', 1)[0]
+    found = False
+    # self.exifDateTimeString = FileObject.getDateTimeStringFromExif(self.absCopiesOrigDateiName)
     found = self.findFileInDirsExact(originalFilesDict)
     # TODO handle mutiple hits
-    logging.debug("Found Exact Match for: "+ self.fileBaseName)
+    logging.debug("Found Exact Match for: " + self.fileBaseName)
     # if found == False:
     #   found = self.findFileInDirsFuzzy(originalFilesDict)
 
-    self.copiesPathRelativeToRootDir=self.absCopiesOrigDateiName[self.ip["SRC-ROOT-DIR_LENGTH"]+1:]          
-    self.copiesDirRelativeToRootDir=os.path.dirname(self.copiesPathRelativeToRootDir)
-    lengthCopiesOrigDir= len(self.ip['FAVORITES-SRC-DIR'])
-    self.copiesLinkDepthToBaseDir=self.copiesDirRelativeToRootDir.count(os.sep)+inputParams["FAVORITES-TGT-DIR"].count(os.sep)-1
-          
-    if found == True:  
-      self.dateiNameOnOriginalRelativeToRootDir=self.absDateiNameOnOriginal[self.ip["SRC-ROOT-DIR_LENGTH"]+1:]
-      self.directoryNameOnOriginalRelativeToRootDir=os.path.dirname(self.dateiNameOnOriginalRelativeToRootDir)
-      self.copiesTgtDirRelativeToRootDir=os.path.join(self.ip['FAVORITES-TGT-DIR'],self.copiesDirRelativeToRootDir[lengthCopiesOrigDir+1:] )
+    self.copiesPathRelativeToRootDir = self.absCopiesOrigDateiName[self.ip["SRC-ROOT-DIR_LENGTH"] + 1:]
+    self.copiesDirRelativeToRootDir = os.path.dirname(self.copiesPathRelativeToRootDir)
+    lengthCopiesOrigDir = len(self.ip['FAVORITES-SRC-DIR'])
+    self.copiesLinkDepthToBaseDir = self.copiesDirRelativeToRootDir.count(os.sep) + inputParams["FAVORITES-TGT-DIR"].count(os.sep)
+    if inputParams["FILE_TYPE"] == "videos":  # -1 for photos +1 for videos
+      # Videos:  20020309_Verabschieden.mkv -> ../../../Familie-Zink-Videos/2002/200203_Wintour Windischgarsten/20020309_Verabschieden.mkv
+      self.copiesLinkDepthToBaseDir = self.copiesLinkDepthToBaseDir + 1
     else:
-      self.copiesTgtDirRelativeToRootDir=os.path.join(self.ip['NOTFOUND_FILES_TGT_DIR'],self.copiesDirRelativeToRootDir[lengthCopiesOrigDir+1:] )
-          
-      
+      # Photos: '20241207_141414_Weihnachtscollage 2024.png' -> '../../../../../Sammlung/2024/202412/20241207_141414_Weihnachtscollage 2024.png'
+      self.copiesLinkDepthToBaseDir = self.copiesLinkDepthToBaseDir - 1
+    if found == True:
+      self.dateiNameOnOriginalRelativeToRootDir = self.absDateiNameOnOriginal[self.ip["SRC-ROOT-DIR_LENGTH"] + 1:]
+      self.directoryNameOnOriginalRelativeToRootDir = os.path.dirname(self.dateiNameOnOriginalRelativeToRootDir)
+      self.copiesTgtDirRelativeToRootDir = os.path.join(
+        self.ip['FAVORITES-TGT-DIR'], self.copiesDirRelativeToRootDir[lengthCopiesOrigDir + 1:])
+    else:
+      self.copiesTgtDirRelativeToRootDir = os.path.join(
+        self.ip['NOTFOUND_FILES_TGT_DIR'], self.copiesDirRelativeToRootDir[lengthCopiesOrigDir + 1:])
 
-  def findFileInDirsExact(self,originalFilesDict):
-      if self.fileBaseName in originalFilesDict:
-          self.absDateiNameOnOriginal = originalFilesDict[self.fileBaseName]['absOrigFileName']
-          self.foundOriginal = True
-          self.findMethod="Exact"
-      else:
-            self.foundOriginal = False   
-      return self.foundOriginal        
- 
+  def findFileInDirsExact(self, originalFilesDict):
+    if self.fileBaseName in originalFilesDict:
+      self.absDateiNameOnOriginal = originalFilesDict[self.fileBaseName]['absOrigFileName']
+      self.foundOriginal = True
+      self.findMethod = "Exact"
+    else:
+      self.foundOriginal = False
+    return self.foundOriginal
 
- 
+
 #   def findFileInDirsFuzzy(self,originalFilesDict):
 #       for curOrigFileName in originalFilesDict:
 #           match = re.search(self.fileBaseName,curOrigFileName,re.IGNORECASE)
@@ -113,7 +116,7 @@ class FileObject:
 #             self.findMethod="CaseInsensitive"
 #             break
 #           else:
-#             curOrigFileId = curOrigFileName.rsplit('_',1)[0]  
+#             curOrigFileId = curOrigFileName.rsplit('_',1)[0]
 #             # special cases
 #             #20091108 11:18:38_TaufeVonValentin.jpg
 #             #20100215 092113_Fasching im Kindergarten.jpg
@@ -147,7 +150,7 @@ class FileObject:
 # #                       self.findMethod="Fuzzy 2"
 # #                       break
 #             else:
-#                #20050907_123010_RadtourWildbadKreuthStrandRottachEgern.jpg ==  20050907_20RadtourWildbadKreuthStrandRottachEgern.JPG  
+#                #20050907_123010_RadtourWildbadKreuthStrandRottachEgern.jpg ==  20050907_20RadtourWildbadKreuthStrandRottachEgern.JPG
 #                #nur mit exiv date zu lösen benutze gexiv library
 #                logging.debug("fuzzy method 3 (exiv) "+ str(self.exifDateTimeString) +" == " +curOrigFileIdNormalized )
 #                if (self.exifDateTimeString == curOrigFileIdNormalized) and (selfFileIdNormalized != ""):
@@ -155,25 +158,24 @@ class FileObject:
 #                    self.findMethod="ExivDate"
 #                    self.foundOriginal = True
 #                    break
-#       return self.foundOriginal        
+#       return self.foundOriginal
 
- 
- 
-  def comparePicturesByExifDate(self,curOrigFullFileName):
-     try:
-         src_exif = GExiv2.Metadata(self.absCopiesOrigDateiName)
-         src_ExifDate = src_exif.get_date_time().strftime('%Y%m%d%H%M%S')
-         #logging.DEBUG("src-exifTimeStamp for " + self.fileBaseName + " is " + src_ExifDate)
-         tgt_exif = GExiv2.Metadata(curOrigFullFileName)
-         tgt_ExifDate = tgt_exif.get_date_time().strftime('%Y%m%d%H%M%S')
-         #logging.DEBUG("tgt-exifTimeStamp for " + os.path.basename(curOrigFullFileName) + " is " +tgt_ExifDate) )
-         if src_ExifDate == tgt_ExifDate:
-             return True
-         else:
-             return False
-     except:
-        logging.debug("Image does not have exiv date time")
+
+  def comparePicturesByExifDate(self, curOrigFullFileName):
+    try:
+      src_exif = GExiv2.Metadata(self.absCopiesOrigDateiName)
+      src_ExifDate = src_exif.get_date_time().strftime('%Y%m%d%H%M%S')
+      # logging.DEBUG("src-exifTimeStamp for " + self.fileBaseName + " is " + src_ExifDate)
+      tgt_exif = GExiv2.Metadata(curOrigFullFileName)
+      tgt_ExifDate = tgt_exif.get_date_time().strftime('%Y%m%d%H%M%S')
+      # logging.DEBUG("tgt-exifTimeStamp for " + os.path.basename(curOrigFullFileName) + " is " +tgt_ExifDate) )
+      if src_ExifDate == tgt_ExifDate:
+        return True
+      else:
         return False
-      
- ################################################################################################      
-#end class      
+    except:
+      logging.debug("Image does not have exiv date time")
+      return False
+
+ ################################################################################################
+# end class
