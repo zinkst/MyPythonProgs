@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 import logging.config
+import re
 from pyaml_env import parse_config
 import codecs
 import logging
@@ -9,6 +10,7 @@ import sys
 import os
 import datetime
 import argparse
+from FileObject import FileObject
 description = """
 This program processes all files in a directory
 """
@@ -27,38 +29,35 @@ def initLogger(config):
     logger.setLevel(logging.INFO)
   return logger
 
+def createSearchPattern(searchExtension):
+  # create searchPattern from extensions
+  searchPattern = r"("
+  for i in range(0, len(searchExtension)):
+    if i == 0:
+      searchPattern = searchPattern + "." + searchExtension[i]
+    else:
+      searchPattern = searchPattern + "|" + "." + searchExtension[i]
+  searchPattern = searchPattern + ")"
+  logging.info("searchPattern :" + searchPattern)
+  return searchPattern
+
 
 ############################################################################
 def processDir(config):
-  for dir, dirList, fileList in os.walk(config["srcDirName"]):
-    for file in fileList:
-      ############################################################################
-      logging.info("Processing File: %s", file)
-
-
-
-############################################################################
-def processFile(srcFileName, tgtFileName):
-  try:
-    fsock = codecs.open(srcFileName, "rb", "utf8")
-    outfile = codecs.open(tgtFileName, "wb", "utf8")
-    try:
-      nextLine = fsock.readline()
-      nextLine = nextLine.rstrip('\r\n')
-      logging.debug("curLine=" + nextLine)
-      while nextLine:
-        ## put your line handling code here ###
-        ###################
-        nextLine = fsock.readline()
-        nextLine = nextLine.rstrip('\r\n')
-    finally:
-      fsock.close()
-      outfile.write('\n')
-      outfile.close()
-  except IOError:
-    logging.debug("error opening file %s " % srcFileName)
-  return 1
-
+  # fileObjects = []
+  # notFoundFileObjects = []
+  # originalFilesDict = {}
+  searchPattern = createSearchPattern(config["searchExtension"])
+  srcDirName = os.path.join(config["srcRootDir"],config["srcRelativeDirName"])
+  for srcDir, dirList, srcDirList in os.walk(srcDirName):
+    for srcFile in srcDirList:
+      resultRE2 = re.search(searchPattern, srcFile, re.IGNORECASE)
+      if resultRE2 != None:
+        srcAbsFileName=os.path.join(srcDir,srcFile)  
+       	logging.info("Processing File: %s", srcAbsFileName)
+        newFile = FileObject(srcAbsFileName,config["srcRootDir"])
+        logging.debug(newFile)  
+        newFile.ProbeVideoFile()
 
 ############################################################################
 # main starts here
@@ -77,7 +76,8 @@ config = parse_config(args.configFileName)
 
 logger = initLogger(config)
 
-logging.info("srcDirName = %s" % config["srcDirName"])
+logging.info("srcRootDir = %s" % config["srcRootDir"])
+logging.info("srcRelativeDirName = %s" % config["srcRelativeDirName"])
 logging.info("tgtDirName = %s" % config["tgtDirName"])
 
 begin = datetime.datetime.now()
