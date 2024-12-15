@@ -52,7 +52,6 @@ videos:
     # Target Directory where symlinks are stored
     TGT-ROOT-DIR: /home/zinks/workspace/testdata_myprg/SymlinkFavoriten/FamilienVideos
     FAVORITES-TGT-DIR: Symlinks-Favoriten
-    FAVORITES-TGT-COMPRESSED-DIR: FamilienVideos-für-Handy
     NOTFOUND_FILES_TGT_DIR: NotFoundFiles
     # directories where Originale are searched
     ORIGINALS-DIRS: 
@@ -65,7 +64,6 @@ videos:
     # Target Directory where symlinks are stored
     TGT-ROOT-DIR: /links/FamilienVideos
     FAVORITES-TGT-DIR: "Favoriten-Familie-Zink-Videos"
-    FAVORITES-TGT-COMPRESSED-DIR: FamilienVideos-für-Handy
     NOTFOUND_FILES_TGT_DIR: NotFoundFiles
     # directories where Originale are searched
     ORIGINALS-DIRS: 

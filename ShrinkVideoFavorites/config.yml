@@ -1,0 +1,15 @@
+# loglevel: DEBUG
+loglevel: INFO
+# srcRootDir: !ENV ${HOME}/workspace/testdata_myprg/SymlinkFavoriten/FamilienVideos 
+srcRootDir: /links/FamilienVideos
+srcRelativeDirName: Favoriten-Familie-Zink-Videos
+searchExtension: [mkv, mp4, mpeg]
+# searchExtension: [mp4, mpeg]
+# camera info used when no info is in the file
+camera_manufacturer_name: Sony 
+camera_model_name: DSC-RX100
+# tgtDirName: !ENV ${HOME}/workspace/src/github.com/zinkst/MyPythonProgs/ShrinkVideoFavorites/testdata/Videos Familie Zink
+tgtDirName: "/links/FamilienVideos/Videos Familie Zink"
+tgtVideoType: mkv
+probeSrcFile: False # if turned on metadata of each sourceFile is checked (slower)
+convertVideoFile: True # if turned on videoFile will be shrinked if tgtFile doesn't exist
