@@ -1,0 +1,4 @@
+# loglevel: DEBUG
+loglevel: INFO
+srcDirName: !ENV ${HOME}/workspace/testdata_myprg/SymlinkFavoriten/FamilienVideos/Favoriten-Familie-Zink-Videos
+tgtDirName: !ENV ${HOME}/workspace/workspace/src/github.com/zinkst/MyPythonProgs/ShrinkVideoFavorites/testdata
