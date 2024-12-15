@@ -1,0 +1,4 @@
+# loglevel: DEBUG
+loglevel: INFO
+srcDirName: !ENV ${HOME}/workspace/src/github.com/zinkst/MyPythonProgs/ProcessFile/testdata
+tgtDirName: !ENV ${HOME}/workspace/src/github.com/zinkst/MyPythonProgs/ProcessFile/testdata
