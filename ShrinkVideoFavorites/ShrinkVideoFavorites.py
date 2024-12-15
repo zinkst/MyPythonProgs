@@ -3,14 +3,13 @@
 import logging.config
 import re
 from pyaml_env import parse_config
-import codecs
 import logging
 import pathlib
 import sys
 import os
 import datetime
 import argparse
-from FileObject import FileObject
+from Classes import FileObject, VideoFile
 description = """
 This program processes all files in a directory
 """
@@ -29,6 +28,7 @@ def initLogger(config):
     logger.setLevel(logging.INFO)
   return logger
 
+
 def createSearchPattern(searchExtension):
   # create searchPattern from extensions
   searchPattern = r"("
@@ -44,23 +44,21 @@ def createSearchPattern(searchExtension):
 
 ############################################################################
 def processDir(config):
-  # fileObjects = []
-  # notFoundFileObjects = []
-  # originalFilesDict = {}
   searchPattern = createSearchPattern(config["searchExtension"])
-  srcDirName = os.path.join(config["srcRootDir"],config["srcRelativeDirName"])
+  srcDirName = os.path.join(config["srcRootDir"], config["srcRelativeDirName"])
   for srcDir, dirList, srcDirList in os.walk(srcDirName):
     for srcFile in srcDirList:
       resultRE2 = re.search(searchPattern, srcFile, re.IGNORECASE)
       if resultRE2 != None:
-        srcAbsFileName=os.path.join(srcDir,srcFile)  
-       	logging.info("Processing File: %s", srcAbsFileName)
-        newFile = FileObject(srcAbsFileName,config["srcRootDir"])
-        logging.debug(newFile)  
-        newFile.ProbeVideoFile()
+        srcAbsFileName = os.path.join(srcDir, srcFile)
+        logging.info("Processing File: %s", srcAbsFileName)
+        newFile = FileObject(srcAbsFileName, config["srcRootDir"])
+        logging.debug("Fileinfo for %s %s", newFile.fileBaseName, newFile)
+        videoFile = VideoFile(newFile)
+        logging.debug("Videoinfo %s", videoFile)
+
 
 ############################################################################
-# main starts here
 # main starts here
 prgPath = pathlib.Path(__file__).parent.resolve()
 prgName = os.path.basename(__file__)
@@ -76,9 +74,10 @@ config = parse_config(args.configFileName)
 
 logger = initLogger(config)
 
-logging.info("srcRootDir = %s" % config["srcRootDir"])
-logging.info("srcRelativeDirName = %s" % config["srcRelativeDirName"])
-logging.info("tgtDirName = %s" % config["tgtDirName"])
+configStr = ""
+for k, v in config.items():
+  configStr += str(k).ljust(21, ' ') + ": " + str(v) + "\n"
+logging.info("configuration used\n%s", configStr)
 
 begin = datetime.datetime.now()
 beginFormatted = begin.strftime('%Y-%m-%d %H:%M:%S')
