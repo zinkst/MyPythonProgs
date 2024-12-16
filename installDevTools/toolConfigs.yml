@@ -73,7 +73,7 @@ tools:
   downloadUrl: "https://github.com/homeport/dyff/releases/download/v{{VERSION}}/dyff_{{VERSION}}_linux_amd64.tar.gz"
   type: binaryTgz
 - name: "fly"
-  version: latest # version: "7.11.2"
+  version: "7.11.2" # latest woulkd work but we are backlevel
   downloadUrl: "https://github.com/concourse/concourse/releases/download/v{{VERSION}}/fly-{{VERSION}}-linux-amd64.tgz"
   type: binaryTgz
 - name: "helm"
@@ -131,6 +131,10 @@ tools:
 - name: "marp"
   version: latest # version: "3.4.0"
   downloadUrl: "https://github.com/marp-team/marp-cli/releases/download/v{{VERSION}}/marp-cli-v{{VERSION}}-linux.tar.gz"
+  type: binaryTgz
+- name: "dive"
+  version: latest # version: "3.4.0"
+  downloadUrl: "https://github.com/wagoodman/dive/releases/download/v{{VERSION}}/dive_{{VERSION}}_linux_amd64.tar.gz"
   type: binaryTgz
 ###############################################################
 # zip
