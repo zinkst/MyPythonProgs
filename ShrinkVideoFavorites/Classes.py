@@ -3,6 +3,7 @@
 
 import os
 import logging
+import re
 
 # dnf install python3-ffmpeg-python.noarch
 # docs: https://kkroening.github.io/ffmpeg-python/
@@ -17,9 +18,10 @@ class FileObject:
   absFileName = ""              # e.g  : /srcfiles/Videos/2024/202400_Sonstige/20020309_Video.mkv
   dirName = ""                  # e.g. : /srcfiles/Videos/2024/202400_Sonstige/
   fileBaseName = ""             # e.g. : 20020309_Video.mkv
+  fileNameWithoutExtension = "" # e.g. : 20020309_Video
   extension = ""                # e.g. : mkv
   srcRootDir = ""               # e.g. : /srcfiles/Videos
-  srcDirRelativeToRootDir = ""  # e.g. : Videos/2024/202400_Sonstige/
+  srcDirRelativeToRootDir = ""  # e.g. : 2024/202400_Sonstige
 
   def __init__(self, absFileName, srcRootDir):
     self.absFileName = absFileName
@@ -28,15 +30,16 @@ class FileObject:
     self.extension = os.path.splitext(self.fileBaseName)[1][1:]
     self.srcRootDir = srcRootDir
     self.srcDirRelativeToRootDir = self.dirName[len(self.srcRootDir) + 1:]
+    self.fileNameWithoutExtension = os.path.splitext(self.fileBaseName)[0]
 
   def __str__(self):
-    return f""" 
-  {"fileBaseName".ljust(25,' ')} : {self.fileBaseName}
-  {"dirName".ljust(25,' ')} : {self.dirName}
-  {"fileBaseName".ljust(25,' ')} : {self.fileBaseName}
-  {"extension".ljust(25,' ')} : {self.extension}
-  {"srcRootDir".ljust(25,' ')} : {self.srcRootDir}
-  {"srcDirRelativeToRootDir".ljust(25,' ')} : {self.srcDirRelativeToRootDir}
+    return f"""
+  {"fileBaseName".ljust(25, ' ')} : {self.fileBaseName}
+  {"dirName".ljust(25, ' ')} : {self.dirName}
+  {"fileBaseName".ljust(25, ' ')} : {self.fileBaseName}
+  {"extension".ljust(25, ' ')} : {self.extension}
+  {"srcRootDir".ljust(25, ' ')} : {self.srcRootDir}
+  {"srcDirRelativeToRootDir".ljust(25, ' ')} : {self.srcDirRelativeToRootDir}
   """
 
 
@@ -44,19 +47,24 @@ class VideoFile:
   fileObject = FileObject
   fallBackCameraModel = ""
   fallBackCameraManufacturer = ""
-  metadata = {} # {"KEY"},[ "string", Boolean ] Boolean True when metadata was empty and changed
+  tgtDirName = ""
+  metadata = {}  # {"KEY"},[ "string", Boolean ] Boolean True when metadata was empty and changed
   videoProps = {}
-  vitalMetaDataKeys = [ "date", "movie_name" ]
+  vitalMetaDataKeys = ["date", "movie_name"]
+  prgConfig = {}
 
-  def __init__(self, fileObject, CameraModel, CameraManufacturer):
+  def __init__(self, fileObject, prgConfig):
     self.fileObject = fileObject
-    self.fallBackCameraManufacturer = CameraManufacturer
-    self.fallBackCameraModel = CameraModel
+    self.prgConfig = prgConfig
+    self.fallBackCameraManufacturer = prgConfig.get("camera_manufacturer_name")
+    self.fallBackCameraModel = prgConfig.get("camera_model_name")
+    self.tgtDirName = prgConfig.get("tgtDirName")
+    self.tgtVideoType = prgConfig.get("tgtVideoType")
     self.ProbeVideoFile()
     self.FillMetadata()
 
   def __str__(self):
-    output = "\n"+   "VideoFile".ljust(25, ' ') + ": " + self.fileObject.absFileName + "\n"
+    output = "\n" + "VideoFile".ljust(25, ' ') + ": " + self.fileObject.absFileName + "\n"
     for k, v in self.metadata.items():
       output += str(k).ljust(25, ' ') + ": " + str(v[0]) + "\n"
     for k, v in self.videoProps.items():
@@ -77,50 +85,77 @@ class VideoFile:
     media_info = MediaInfo.parse(self.fileObject.absFileName)
     for track in media_info.tracks:
       if track.track_type == "General":
-        self.metadata["date"] = [ track.date, False ]
-        if track.camera_manufacturer_name != None:
-          self.metadata["camera_manufacturer_name"] = [ track.camera_manufacturer_name,  False ]
-        if track.camera_model_name != None:
-          self.metadata["camera_model_name"] = [ track.camera_model_name,  False ]
-        if track.location != 'nul' and track.location != None:
-          self.metadata["location"] = [ track.location, False ]
+        if track.date:
+          self.metadata["date"] = [track.date, False]
+        if track.camera_manufacturer_name:
+          self.metadata["camera_manufacturer_name"] = [track.camera_manufacturer_name, False]
+        if track.camera_model_name:
+          self.metadata["camera_model_name"] = [track.camera_model_name, False]
+        if track.location != 'nul' and track.location:
+          self.metadata["location"] = [track.location, False]
         else:
-          self.metadata["location"] = [ "unknown", False ]
-        if track.movie_name != None:
-          self.metadata["movie_name"] = [ track.movie_name, False ]
-        elif track.title != None:
-          self.metadata["movie_name"] = [ track.title, False ]  
+          self.metadata["location"] = ["unknown", False]
+        if track.movie_name:
+          self.metadata["movie_name"] = [track.movie_name, False]
+        elif track.title:
+          self.metadata["movie_name"] = [track.title, False]
       elif track.track_type == "Video":
-        self.videoProps["width"] = track.width   # Breite des Videos in Pixel
-        self.videoProps["height"] = track.height # Höhe des Videos in Pixel
+          if track.rotation:
+            self.videoProps["rotation"] = track.rotation
+          else:
+            self.videoProps["rotation"] = 0  
+          self.videoProps["width"] = track.width   # Breite des Videos in Pixel
+          self.videoProps["height"] = track.height  # Höhe des Videos in Pixel
       # elif track.track_type == "Audio":
       #   print("Track data:")
       #   pprint(track.to_data())
-        
+
   ##############################################################################################
   def FillMetadata(self):
     if not self.metadata.get("date"):
-       logging.info("trying to compute date from filename %s ", os.path.join(self.fileObject.srcDirRelativeToRootDir, self.fileObject.fileBaseName))
-       computedDate = "TBD"
-       self.metadata["date"] = [ computedDate, True ]
+      logging.info("trying to compute date from filename %s ", os.path.join(
+        self.fileObject.srcDirRelativeToRootDir, self.fileObject.fileBaseName))
+      computedDate = self.computeDateFromFileName()
+      if computedDate != "":
+        self.metadata["date"] = [computedDate, True]
     if not self.metadata.get("movie_name"):
-      logging.info("trying to compute movie_name from filename %s ", os.path.join(self.fileObject.srcDirRelativeToRootDir, self.fileObject.fileBaseName))
+      logging.info("trying to compute movie_name from filename %s ", os.path.join(
+        self.fileObject.srcDirRelativeToRootDir, self.fileObject.fileBaseName))
       computedMovieName = "TBD"
-      self.metadata["movie_name"] = [ computedMovieName, True ]
-    if not self.metadata.get("camera_manufacturer_name"):
-      logging.info("setting camera_manufacturer_name to %s", self.fallBackCameraManufacturer)
-      # self.metadata["camera_manufacturer_name"] = [ self.fallBackCameraManufacturer, True ]
-    if not self.metadata.get("camera_model_name"):
-      logging.info("setting camera_model_name to %s", self.fallBackCameraModel)
-      # self.metadata["camera_model_name"] = [ self.fallBackCameraModel, True ]
-  
+      self.metadata["movie_name"] = [computedMovieName, True]
+    # if not self.metadata.get("camera_manufacturer_name"):
+    #   logging.info("setting camera_manufacturer_name to %s", self.fallBackCameraManufacturer)
+    #   # self.metadata["camera_manufacturer_name"] = [ self.fallBackCameraManufacturer, True ]
+    # if not self.metadata.get("camera_model_name"):
+    #   logging.info("setting camera_model_name to %s", self.fallBackCameraModel)
+    #   # self.metadata["camera_model_name"] = [ self.fallBackCameraModel, True ]
+
+  ##############################################################################################
+  def computeDateFromFileName(self):
+    # 2015/0807_Henry und Valentin springen im Freibad_1546.mp4
+    dirName = self.fileObject.srcDirRelativeToRootDir
+    fileName = self.fileObject.fileBaseName
+    computedDate = ""
+    x = re.search(r" */([0-9]{4})", dirName)
+    if x:
+      # 0807_Henry und Valentin springen im Freibad_1546.mp4
+      year = x.group(1)
+
+      y = re.findall(r"([0-9]{4})_.*_([0-9]{4})\..*", fileName)
+      # [('0807', '1546')]
+      resultTuple = y[0]
+      # ('0807', '1546')
+      monthDay = resultTuple[0] + "_" + resultTuple[1] + "00"
+      computedDate = year + monthDay
+    return computedDate
+
   ##############################################################################################
   def isMetadataUpdated(self):
     for v in self.metadata.values:
       if v[1] == True:
         return True
     return False
-  
+
   ##############################################################################################
   def isEssentialMetadataUpdated(self):
     metadata_updated = False
@@ -131,36 +166,69 @@ class VideoFile:
     return metadata_updated
 
   ##############################################################################################
+  def isEssentialMetadataMissing(self):
+    metadata_missing = False
+    if self.metadata.get("date")[0] == "":
+      metadata_missing = True
+    if self.metadata.get("movie_name")[0] == "":
+      metadata_missing = True
+    return metadata_missing
+
+  ##############################################################################################
   def printEssentialMetadata(self):
     for index, entry in enumerate(self.vitalMetaDataKeys):
       if index == 0:
         output = str(entry).ljust(14, ' ') + ": " + self.metadata.get(entry)[0] + "\n"
-      elif index == len(self.vitalMetaDataKeys) -1:
-        output += str(entry).ljust(15, ' ') + ": " + self.metadata.get(entry)[0]  
+      elif index == len(self.vitalMetaDataKeys) - 1:
+        output += str(entry).ljust(15, ' ') + ": " + self.metadata.get(entry)[0]
       else:
-        output += str(entry).ljust(15, ' ') + ": " + self.metadata.get(entry)[0] + "\n"  
+        output += str(entry).ljust(15, ' ') + ": " + self.metadata.get(entry)[0] + "\n"
     return output
-        
+
   ##############################################################################################
   def ConvertVideoFile(self):
-    cmd = """
-      ffmpeg -y \
-      -loglevel error \
-      -i \"${SRC_FILENAME}\" \
-      -metadata title=\"${OUTPUTNAME}\" \
-      -metadata date=${ORIGTIMESTAMP} \
-      -metadata creation_time=\"${ORIGTIMESTAMP_ISO8601}\" \
-      -metadata location=\"${GPSCOORDINATES}\" \
-      -metadata Make=\"${CAMERA_MANUFACTURER}\" \
-      -metadata \"Camera Manufacturer Name\"=\"${CAMERA_MANUFACTURER}\" \
-      -metadata \"Camera Model Name\"=\"${CAMERA_MODEL_NAME}\" \
-      -c:v libsvtav1 -crf 50 \
-      -c:a libopus \
-      -c:s copy \
-      -map_metadata 0 \
-      -vf scale=1920:-1 \
-      \"${TGT_FILENAME}\""
-"""
-  # output AV1 see https://filmora.wondershare.de/more-tips/av1-vs-vp9.html
-  # https://trac.ffmpeg.org/wiki/Encode/AV1
-  # https://apps.theodo.com/article/optimizing-video-assets-to-drastically-reduce-app-size
+    outPutFileName = os.path.join(self.tgtDirName, self.fileObject.srcDirRelativeToRootDir,
+                                  self.fileObject.fileNameWithoutExtension + "." + self.tgtVideoType)
+    if os.path.exists(outPutFileName):
+      logging.info("File %s already exists - skipping ", outPutFileName)
+      return
+    if not os.path.exists(os.path.dirname(outPutFileName)):
+      os.makedirs(os.path.dirname(outPutFileName))
+    logging.info("Converting to %s", outPutFileName)
+    ffmpegArgs = {}
+    ffmpegArgs["loglevel"] = "panic"
+    ffmpegArgs["c:v"] = "libsvtav1"
+    ffmpegArgs["crf"] = 40
+    ffmpegArgs["c:a"] = "libopus"
+    ffmpegArgs["c:s"] = "copy"
+    ffmpegArgs["map_metadata"] = 0
+    # reduce size for 4k videos
+    if self.videoProps.get("rotation") != 0:
+      if self.videoProps.get("height") > 1920:
+        ffmpegArgs["vf"] = "scale=-1:1920"
+    elif self.videoProps.get("width") > 1920:
+      ffmpegArgs["vf"] = "scale=1920:-1"
+    # add metadata which didn't exist in source file
+    if self.isEssentialMetadataUpdated():
+      ffmpegArgs |= self.addUnsetMetadataParams()
+
+    try:
+      input = ffmpeg.input(self.fileObject.absFileName)
+      output = ffmpeg.output(input, outPutFileName, **ffmpegArgs)
+      ffmpeg.run(output)
+    except ffmpeg.Error as e:
+      logging.error("Error converting %s ", outPutFileName )
+      logging.error("deleting file %s ", outPutFileName )
+      os.remove(outPutFileName) 
+
+  ##############################################################################################
+  def addUnsetMetadataParams(self):
+    ffmpegArgs = {}
+    for k, v in self.metadata.items():
+      if v[1] == True:
+        match k:
+          case "date":
+            ffmpegArgs["date"] = v[0]
+          case "movie_name":
+            ffmpegArgs["title"] = v[0]
+    return ffmpegArgs

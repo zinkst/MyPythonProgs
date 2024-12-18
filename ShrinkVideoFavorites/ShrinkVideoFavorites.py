@@ -51,15 +51,15 @@ def processDir(config):
       if re.search(searchPattern, srcFile, re.IGNORECASE) != None:
         srcAbsFileName = os.path.join(srcDir, srcFile)
         logging.info("Processing File: %s", srcAbsFileName)
-        newFile = FileObject(srcAbsFileName, config["srcRootDir"])
+        newFile = FileObject(srcAbsFileName, os.path.join(config["srcRootDir"],config["srcRelativeDirName"]))
         logging.debug("Fileinfo for %s %s", newFile.fileBaseName, newFile)
-        videoFile = VideoFile(newFile, config["camera_model_name"], config["camera_manufacturer_name"])
+        videoFile = VideoFile(newFile, config)
         logging.debug("Videoinfo %s", videoFile)
-        if videoFile.isEssentialMetadataUpdated() == True:
+        if videoFile.isEssentialMetadataMissing() == True:
           logging.info("Vital Metadata is missing for Video --- exiting \n %s", videoFile.fileObject.absFileName )
           sys.exit(-1)
-        logging.info("Vital Video Metadata:\n %s", videoFile.printEssentialMetadata()) 
-        
+        logging.debug("Vital Video Metadata:\n %s", videoFile.printEssentialMetadata()) 
+        videoFile.ConvertVideoFile()
 
 ############################################################################
 # main starts here
@@ -80,6 +80,7 @@ logger = initLogger(config)
 
 if args.year != None:
   config["srcRelativeDirName"] = os.path.join(config["srcRelativeDirName"],args.year)
+  config["tgtDirName"] = os.path.join(config["tgtDirName"],args.year)
 
 configStr = ""
 for k, v in config.items():
