@@ -5,3 +5,6 @@ srcRelativeDirName: FamilienVideos/Favoriten-Familie-Zink-Videos
 tgtDirName: !ENV ${HOME}/workspace/workspace/src/github.com/zinkst/MyPythonProgs/ShrinkVideoFavorites/testdata
 searchExtension: [mkv, mp4, mpeg]
 # searchExtension: [mp4, mpeg]
+# camera info used when no info is in the file
+camera_manufacturer_name: Sony 
+camera_model_name: DSC-RX100

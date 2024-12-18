@@ -48,14 +48,16 @@ def processDir(config):
   srcDirName = os.path.join(config["srcRootDir"], config["srcRelativeDirName"])
   for srcDir, dirList, srcDirList in os.walk(srcDirName):
     for srcFile in srcDirList:
-      resultRE2 = re.search(searchPattern, srcFile, re.IGNORECASE)
-      if resultRE2 != None:
+      if re.search(searchPattern, srcFile, re.IGNORECASE) != None:
         srcAbsFileName = os.path.join(srcDir, srcFile)
         logging.info("Processing File: %s", srcAbsFileName)
         newFile = FileObject(srcAbsFileName, config["srcRootDir"])
         logging.debug("Fileinfo for %s %s", newFile.fileBaseName, newFile)
-        videoFile = VideoFile(newFile)
+        videoFile = VideoFile(newFile, config["camera_model_name"], config["camera_manufacturer_name"])
         logging.debug("Videoinfo %s", videoFile)
+        if videoFile.isEssentialMetadataUpdated() == True:
+          logging.info("Vital Metadata is missing for Video --- exiting \n %s", videoFile.fileObject.absFileName )
+          sys.exit(-1)
 
 
 ############################################################################
@@ -67,6 +69,7 @@ defaultConfigFileName = os.path.join(prgPath, "config.yml")
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-c", "--configFileName", type=str, nargs='?', default=defaultConfigFileName, help="path to config file")
+parser.add_argument("-y", "--year", type=str, nargs='?', help="year to proccess")
 args = parser.parse_args()
 print(args)
 
@@ -74,9 +77,12 @@ config = parse_config(args.configFileName)
 
 logger = initLogger(config)
 
+if args.year != "":
+  config["srcRelativeDirName"] = os.path.join(config["srcRelativeDirName"],args.year)
+
 configStr = ""
 for k, v in config.items():
-  configStr += str(k).ljust(21, ' ') + ": " + str(v) + "\n"
+  configStr += str(k).ljust(31, ' ') + ": " + str(v) + "\n"
 logging.info("configuration used\n%s", configStr)
 
 begin = datetime.datetime.now()
