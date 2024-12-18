@@ -58,7 +58,8 @@ def processDir(config):
         if videoFile.isEssentialMetadataUpdated() == True:
           logging.info("Vital Metadata is missing for Video --- exiting \n %s", videoFile.fileObject.absFileName )
           sys.exit(-1)
-
+        logging.info("Vital Video Metadata:\n %s", videoFile.printEssentialMetadata()) 
+        
 
 ############################################################################
 # main starts here
@@ -77,7 +78,7 @@ config = parse_config(args.configFileName)
 
 logger = initLogger(config)
 
-if args.year != "":
+if args.year != None:
   config["srcRelativeDirName"] = os.path.join(config["srcRelativeDirName"],args.year)
 
 configStr = ""

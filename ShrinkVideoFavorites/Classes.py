@@ -46,7 +46,8 @@ class VideoFile:
   fallBackCameraManufacturer = ""
   metadata = {} # {"KEY"},[ "string", Boolean ] Boolean True when metadata was empty and changed
   videoProps = {}
-   
+  vitalMetaDataKeys = [ "date", "movie_name" ]
+
   def __init__(self, fileObject, CameraModel, CameraManufacturer):
     self.fileObject = fileObject
     self.fallBackCameraManufacturer = CameraManufacturer
@@ -98,20 +99,20 @@ class VideoFile:
         
   ##############################################################################################
   def FillMetadata(self):
-    if self.metadata["date"][0] == None:
+    if not self.metadata.get("date"):
        logging.info("trying to compute date from filename %s ", os.path.join(self.fileObject.srcDirRelativeToRootDir, self.fileObject.fileBaseName))
        computedDate = "TBD"
        self.metadata["date"] = [ computedDate, True ]
-    if self.metadata["movie_name"][0] == None:
+    if not self.metadata.get("movie_name"):
       logging.info("trying to compute movie_name from filename %s ", os.path.join(self.fileObject.srcDirRelativeToRootDir, self.fileObject.fileBaseName))
       computedMovieName = "TBD"
       self.metadata["movie_name"] = [ computedMovieName, True ]
-    if self.metadata["camera_manufacturer_name"][0] == None:
+    if not self.metadata.get("camera_manufacturer_name"):
       logging.info("setting camera_manufacturer_name to %s", self.fallBackCameraManufacturer)
-      self.metadata["camera_manufacturer_name"] = [ self.fallBackCameraManufacturer, True ]
-    if self.metadata["camera_model_name"][0] == None:
+      # self.metadata["camera_manufacturer_name"] = [ self.fallBackCameraManufacturer, True ]
+    if not self.metadata.get("camera_model_name"):
       logging.info("setting camera_model_name to %s", self.fallBackCameraModel)
-      self.metadata["camera_model_name"] = [ self.fallBackCameraModel, True ]
+      # self.metadata["camera_model_name"] = [ self.fallBackCameraModel, True ]
   
   ##############################################################################################
   def isMetadataUpdated(self):
@@ -123,11 +124,22 @@ class VideoFile:
   ##############################################################################################
   def isEssentialMetadataUpdated(self):
     metadata_updated = False
-    if self.metadata["date"][1] == True:
+    if self.metadata.get("date")[1] == True:
       metadata_updated = True
-    if self.metadata["movie_name"][1] == True:
+    if self.metadata.get("movie_name")[1] == True:
       metadata_updated = True
     return metadata_updated
+
+  ##############################################################################################
+  def printEssentialMetadata(self):
+    for index, entry in enumerate(self.vitalMetaDataKeys):
+      if index == 0:
+        output = str(entry).ljust(14, ' ') + ": " + self.metadata.get(entry)[0] + "\n"
+      elif index == len(self.vitalMetaDataKeys) -1:
+        output += str(entry).ljust(15, ' ') + ": " + self.metadata.get(entry)[0]  
+      else:
+        output += str(entry).ljust(15, ' ') + ": " + self.metadata.get(entry)[0] + "\n"  
+    return output
         
   ##############################################################################################
   def ConvertVideoFile(self):
