@@ -18,7 +18,7 @@ class FileObject:
   absFileName = ""              # e.g  : /srcfiles/Videos/2024/202400_Sonstige/20020309_Video.mkv
   dirName = ""                  # e.g. : /srcfiles/Videos/2024/202400_Sonstige/
   fileBaseName = ""             # e.g. : 20020309_Video.mkv
-  fileNameWithoutExtension = "" # e.g. : 20020309_Video
+  fileNameWithoutExtension = ""  # e.g. : 20020309_Video
   extension = ""                # e.g. : mkv
   srcRootDir = ""               # e.g. : /srcfiles/Videos
   srcDirRelativeToRootDir = ""  # e.g. : 2024/202400_Sonstige
@@ -100,15 +100,12 @@ class VideoFile:
         elif track.title:
           self.metadata["movie_name"] = [track.title, False]
       elif track.track_type == "Video":
-          if track.rotation:
-            self.videoProps["rotation"] = track.rotation
-          else:
-            self.videoProps["rotation"] = 0  
-          self.videoProps["width"] = track.width   # Breite des Videos in Pixel
-          self.videoProps["height"] = track.height  # Höhe des Videos in Pixel
-      # elif track.track_type == "Audio":
-      #   print("Track data:")
-      #   pprint(track.to_data())
+        if track.rotation:
+          self.videoProps["rotation"] = track.rotation
+        else:
+          self.videoProps["rotation"] = 0
+        self.videoProps["width"] = track.width   # Breite des Videos in Pixel
+        self.videoProps["height"] = track.height  # Höhe des Videos in Pixel
 
   ##############################################################################################
   def FillMetadata(self):
@@ -217,9 +214,9 @@ class VideoFile:
       output = ffmpeg.output(input, outPutFileName, **ffmpegArgs)
       ffmpeg.run(output)
     except ffmpeg.Error as e:
-      logging.error("Error converting %s ", outPutFileName )
-      logging.error("deleting file %s ", outPutFileName )
-      os.remove(outPutFileName) 
+      logging.error("Error converting %s ", outPutFileName)
+      logging.error("deleting file %s ", outPutFileName)
+      os.remove(outPutFileName)
 
   ##############################################################################################
   def addUnsetMetadataParams(self):
