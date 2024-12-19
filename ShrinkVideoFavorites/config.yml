@@ -8,6 +8,6 @@ searchExtension: [mkv, mp4, mpeg]
 # camera info used when no info is in the file
 camera_manufacturer_name: Sony 
 camera_model_name: DSC-RX100
-# tgtDirName: !ENV ${HOME}/workspace/src/github.com/zinkst/MyPythonProgs/ShrinkVideoFavorites/testdata
+# tgtDirName: !ENV ${HOME}/workspace/src/github.com/zinkst/MyPythonProgs/ShrinkVideoFavorites/testdata/Videos Familie Zink
 tgtDirName: "/links/FamilienVideos/Videos Familie Zink"
 tgtVideoType: mkv

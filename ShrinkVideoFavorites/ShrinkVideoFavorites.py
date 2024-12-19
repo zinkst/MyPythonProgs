@@ -29,6 +29,7 @@ def initLogger(config):
   return logger
 
 
+############################################################################
 def createSearchPattern(searchExtension):
   # create searchPattern from extensions
   searchPattern = r"("
@@ -45,13 +46,13 @@ def createSearchPattern(searchExtension):
 ############################################################################
 def processDir(config):
   searchPattern = createSearchPattern(config["searchExtension"])
-  srcDirName = os.path.join(config["srcRootDir"], config["srcRelativeDirName"])
-  for srcDir, dirList, srcDirList in os.walk(srcDirName):
+  fullSrcDirName = os.path.join(config["srcRootDir"], config["srcRelativeDirName"], config["year"])
+  for srcDir, dirList, srcDirList in os.walk(fullSrcDirName):
     for srcFile in srcDirList:
       if re.search(searchPattern, srcFile, re.IGNORECASE) != None:
         srcAbsFileName = os.path.join(srcDir, srcFile)
         logging.info("Processing File: %s", srcAbsFileName)
-        newFile = FileObject(srcAbsFileName, os.path.join(config["srcRootDir"],config["srcRelativeDirName"]))
+        newFile = FileObject(srcAbsFileName, config["srcRootDir"], config["srcRelativeDirName"])
         logging.debug("Fileinfo for %s %s", newFile.fileBaseName, newFile)
         videoFile = VideoFile(newFile, config)
         logging.debug("Videoinfo %s", videoFile)
@@ -59,10 +60,11 @@ def processDir(config):
           videoFile.ProbeVideoFile()
           videoFile.FillMetadata()
           if videoFile.isEssentialMetadataMissing() == True:
-            logging.info("Vital Metadata is missing for Video --- exiting \n %s", videoFile.fileObject.absFileName )
+            logging.info("Vital Metadata is missing for Video --- exiting \n %s", videoFile.fileObject.absFileName)
             sys.exit(-1)
-          logging.debug("Vital Video Metadata:\n %s", videoFile.printEssentialMetadata()) 
+          logging.debug("Vital Video Metadata:\n %s", videoFile.printEssentialMetadata())
           videoFile.ConvertVideoFile()
+
 
 ############################################################################
 # main starts here
@@ -82,8 +84,9 @@ config = parse_config(args.configFileName)
 logger = initLogger(config)
 
 if args.year != None:
-  config["srcRelativeDirName"] = os.path.join(config["srcRelativeDirName"],args.year)
-  config["tgtDirName"] = os.path.join(config["tgtDirName"],args.year)
+  config["year"] = args.year
+else:
+  config["year"] = ""
 
 configStr = ""
 for k, v in config.items():

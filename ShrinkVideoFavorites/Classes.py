@@ -15,28 +15,29 @@ from pymediainfo import MediaInfo
 
 
 class FileObject:
-  absFileName = ""              # e.g  : /srcfiles/Videos/2024/202400_Sonstige/20020309_Video.mkv
-  dirName = ""                  # e.g. : /srcfiles/Videos/2024/202400_Sonstige/
+  absFileName = ""              # e.g  : /srcfiles/Videos/Favoriten/2024/202400_Sonstige/20020309_Video.mkv
+  srcFileDirName = ""           # e.g. : /srcfiles/Videos
+  srcRelativeDirName = ""       # e.g. : Favoriten
   fileBaseName = ""             # e.g. : 20020309_Video.mkv
   fileNameWithoutExtension = ""  # e.g. : 20020309_Video
   extension = ""                # e.g. : mkv
   srcRootDir = ""               # e.g. : /srcfiles/Videos
   srcDirRelativeToRootDir = ""  # e.g. : 2024/202400_Sonstige
-  tgtFileName = ""
 
-  def __init__(self, absFileName, srcRootDir):
+  def __init__(self, absFileName, srcRootDir, srcRelativeDirName):
     self.absFileName = absFileName
-    self.dirName = os.path.dirname(self.absFileName)
+    self.srcRootDir = srcRootDir
+    self.srcRelativeDirName = srcRelativeDirName
+    self.srcFileDirName = os.path.dirname(self.absFileName)
     self.fileBaseName = os.path.basename(self.absFileName)
     self.extension = os.path.splitext(self.fileBaseName)[1][1:]
-    self.srcRootDir = srcRootDir
-    self.srcDirRelativeToRootDir = self.dirName[len(self.srcRootDir) + 1:]
+    self.srcDirRelativeToRootDir = self.srcFileDirName[len(self.srcRootDir) + len(srcRelativeDirName) + 2:]
     self.fileNameWithoutExtension = os.path.splitext(self.fileBaseName)[0]
 
   def __str__(self):
     return f"""
   {"fileBaseName".ljust(25, ' ')} : {self.fileBaseName}
-  {"dirName".ljust(25, ' ')} : {self.dirName}
+  {"dirName".ljust(25, ' ')} : {self.srcFileDirName}
   {"fileBaseName".ljust(25, ' ')} : {self.fileBaseName}
   {"extension".ljust(25, ' ')} : {self.extension}
   {"srcRootDir".ljust(25, ' ')} : {self.srcRootDir}
@@ -64,7 +65,7 @@ class VideoFile:
     self.tgtVideoType = prgConfig.get("tgtVideoType")
     self.tgtFileName = os.path.join(self.tgtDirName, self.fileObject.srcDirRelativeToRootDir,
                                     self.fileObject.fileNameWithoutExtension + "." + self.tgtVideoType)
-    
+
   def __str__(self):
     output = "\n" + "VideoFile".ljust(25, ' ') + ": " + self.fileObject.absFileName + "\n"
     for k, v in self.metadata.items():
@@ -135,7 +136,7 @@ class VideoFile:
     dirName = self.fileObject.srcDirRelativeToRootDir
     fileName = self.fileObject.fileBaseName
     computedDate = ""
-    x = re.search(r" */([0-9]{4})", dirName)
+    x = re.search(r" *([0-9]{4})", dirName)
     if x:
       # 0807_Henry und Valentin springen im Freibad_1546.mp4
       year = x.group(1)
@@ -191,7 +192,7 @@ class VideoFile:
       return True
     else:
       return False
-      
+
   ##############################################################################################
   def ConvertVideoFile(self):
     if self.targetFileExists():
@@ -207,11 +208,11 @@ class VideoFile:
     ffmpegArgs["c:s"] = "copy"
     ffmpegArgs["map_metadata"] = 0
     # reduce size for 4k videos
-    if self.videoProps.get("rotation") != 0:
+    if float(self.videoProps.get("rotation")) > 0:
       if self.videoProps.get("height") > 1920:
-        ffmpegArgs["vf"] = "scale=-1:1920"
+        ffmpegArgs["vf"] = "scale=iw/2:ih/2"
     elif self.videoProps.get("width") > 1920:
-      ffmpegArgs["vf"] = "scale=1920:-1"
+      ffmpegArgs["vf"] = "scale=iw/2:ih/2"
     # add metadata which didn't exist in source file
     if self.isEssentialMetadataUpdated():
       ffmpegArgs |= self.addUnsetMetadataParams()
@@ -232,7 +233,7 @@ class VideoFile:
       if v[1] == True:
         match k:
           case "date":
-            ffmpegArgs["date"] = v[0]
+            ffmpegArgs["metadata"] = "date=" + v[0]
           case "movie_name":
-            ffmpegArgs["title"] = v[0]
+            ffmpegArgs["metadata"] = "title" + v[0]
     return ffmpegArgs
