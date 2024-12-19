@@ -22,6 +22,7 @@ class FileObject:
   extension = ""                # e.g. : mkv
   srcRootDir = ""               # e.g. : /srcfiles/Videos
   srcDirRelativeToRootDir = ""  # e.g. : 2024/202400_Sonstige
+  tgtFileName = ""
 
   def __init__(self, absFileName, srcRootDir):
     self.absFileName = absFileName
@@ -48,6 +49,7 @@ class VideoFile:
   fallBackCameraModel = ""
   fallBackCameraManufacturer = ""
   tgtDirName = ""
+  tgtFileName = ""
   metadata = {}  # {"KEY"},[ "string", Boolean ] Boolean True when metadata was empty and changed
   videoProps = {}
   vitalMetaDataKeys = ["date", "movie_name"]
@@ -60,9 +62,9 @@ class VideoFile:
     self.fallBackCameraModel = prgConfig.get("camera_model_name")
     self.tgtDirName = prgConfig.get("tgtDirName")
     self.tgtVideoType = prgConfig.get("tgtVideoType")
-    self.ProbeVideoFile()
-    self.FillMetadata()
-
+    self.tgtFileName = os.path.join(self.tgtDirName, self.fileObject.srcDirRelativeToRootDir,
+                                    self.fileObject.fileNameWithoutExtension + "." + self.tgtVideoType)
+    
   def __str__(self):
     output = "\n" + "VideoFile".ljust(25, ' ') + ": " + self.fileObject.absFileName + "\n"
     for k, v in self.metadata.items():
@@ -183,15 +185,20 @@ class VideoFile:
     return output
 
   ##############################################################################################
+  def targetFileExists(self):
+    if os.path.exists(self.tgtFileName):
+      logging.info("File %s already exists - skipping ", self.tgtFileName)
+      return True
+    else:
+      return False
+      
+  ##############################################################################################
   def ConvertVideoFile(self):
-    outPutFileName = os.path.join(self.tgtDirName, self.fileObject.srcDirRelativeToRootDir,
-                                  self.fileObject.fileNameWithoutExtension + "." + self.tgtVideoType)
-    if os.path.exists(outPutFileName):
-      logging.info("File %s already exists - skipping ", outPutFileName)
+    if self.targetFileExists():
       return
-    if not os.path.exists(os.path.dirname(outPutFileName)):
-      os.makedirs(os.path.dirname(outPutFileName))
-    logging.info("Converting to %s", outPutFileName)
+    if not os.path.exists(os.path.dirname(self.tgtFileName)):
+      os.makedirs(os.path.dirname(self.tgtFileName))
+    logging.info("Converting to %s", self.tgtFileName)
     ffmpegArgs = {}
     ffmpegArgs["loglevel"] = "panic"
     ffmpegArgs["c:v"] = "libsvtav1"
@@ -211,12 +218,12 @@ class VideoFile:
 
     try:
       input = ffmpeg.input(self.fileObject.absFileName)
-      output = ffmpeg.output(input, outPutFileName, **ffmpegArgs)
+      output = ffmpeg.output(input, self.tgtFileName, **ffmpegArgs)
       ffmpeg.run(output)
     except ffmpeg.Error as e:
-      logging.error("Error converting %s ", outPutFileName)
-      logging.error("deleting file %s ", outPutFileName)
-      os.remove(outPutFileName)
+      logging.error("Error converting %s ", self.tgtFileName)
+      logging.error("deleting file %s ", self.tgtFileName)
+      os.remove(self.tgtFileName)
 
   ##############################################################################################
   def addUnsetMetadataParams(self):

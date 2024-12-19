@@ -55,11 +55,14 @@ def processDir(config):
         logging.debug("Fileinfo for %s %s", newFile.fileBaseName, newFile)
         videoFile = VideoFile(newFile, config)
         logging.debug("Videoinfo %s", videoFile)
-        if videoFile.isEssentialMetadataMissing() == True:
-          logging.info("Vital Metadata is missing for Video --- exiting \n %s", videoFile.fileObject.absFileName )
-          sys.exit(-1)
-        logging.debug("Vital Video Metadata:\n %s", videoFile.printEssentialMetadata()) 
-        videoFile.ConvertVideoFile()
+        if not videoFile.targetFileExists():
+          videoFile.ProbeVideoFile()
+          videoFile.FillMetadata()
+          if videoFile.isEssentialMetadataMissing() == True:
+            logging.info("Vital Metadata is missing for Video --- exiting \n %s", videoFile.fileObject.absFileName )
+            sys.exit(-1)
+          logging.debug("Vital Video Metadata:\n %s", videoFile.printEssentialMetadata()) 
+          videoFile.ConvertVideoFile()
 
 ############################################################################
 # main starts here
