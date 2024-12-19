@@ -151,7 +151,7 @@ class VideoFile:
 
   ##############################################################################################
   def isMetadataUpdated(self):
-    for v in self.metadata.values:
+    for v in self.metadata.values():
       if v[1] == True:
         return True
     return False

@@ -45,26 +45,41 @@ def createSearchPattern(searchExtension):
 
 ############################################################################
 def processDir(config):
+  filesWithMissingMetadata = []
   searchPattern = createSearchPattern(config["searchExtension"])
   fullSrcDirName = os.path.join(config["srcRootDir"], config["srcRelativeDirName"], config["year"])
   for srcDir, dirList, srcDirList in os.walk(fullSrcDirName):
     for srcFile in srcDirList:
       if re.search(searchPattern, srcFile, re.IGNORECASE) != None:
         srcAbsFileName = os.path.join(srcDir, srcFile)
-        logging.info("Processing File: %s", srcAbsFileName)
+        logging.debug("Processing File: %s", srcAbsFileName)
         newFile = FileObject(srcAbsFileName, config["srcRootDir"], config["srcRelativeDirName"])
         logging.debug("Fileinfo for %s %s", newFile.fileBaseName, newFile)
         videoFile = VideoFile(newFile, config)
         logging.debug("Videoinfo %s", videoFile)
-        if not videoFile.targetFileExists():
+        if videoFile.targetFileExists() and not config.get("probeSrcFile") :
+          logging.info("File %s already exists - skipping ", videoFile.tgtFileName)
+        else: 
           videoFile.ProbeVideoFile()
+          if videoFile.isMetadataUpdated() == True:
+            logging.info("Metadata was updated for Video \n %s", videoFile.fileObject.absFileName)
+            filesWithMissingMetadata.append(videoFile.fileObject.absFileName)
           videoFile.FillMetadata()
-          if videoFile.isEssentialMetadataMissing() == True:
-            logging.info("Vital Metadata is missing for Video --- exiting \n %s", videoFile.fileObject.absFileName)
-            sys.exit(-1)
           logging.debug("Vital Video Metadata:\n %s", videoFile.printEssentialMetadata())
-          videoFile.ConvertVideoFile()
+          if config.get("convertVideoFile"):
+            videoFile.ConvertVideoFile()
+  return filesWithMissingMetadata
 
+############################################################################
+def writeFilesWithMissingMetadataToFile(missingMetadataFiles, config):
+  if len(missingMetadataFiles) > 0:
+    outFileName = os.path.join(config["tgtDirName"], config["year"], "missingMetadataFiles.txt")
+    with open(outFileName, 'w') as outfile:
+      for idx, entry in enumerate(missingMetadataFiles):
+        outline = str(k).ljust(5, ' ') + ": " + str(entry)
+        logging.info(outline)
+        outfile.write(entry + '\n')
+      outfile.write("Number of Found files : " + str(len(missingMetadataFiles)) + "\n") 
 
 ############################################################################
 # main starts here
@@ -97,7 +112,8 @@ begin = datetime.datetime.now()
 beginFormatted = begin.strftime('%Y-%m-%d %H:%M:%S')
 logging.info("starting processing at " + beginFormatted)
 
-processDir(config)
+filesWithMissingMetadata = processDir(config)
+writeFilesWithMissingMetadataToFile(filesWithMissingMetadata, config)
 
 end = datetime.datetime.now()
 endFormatted = begin.strftime('%Y-%m-%d %H:%M:%S')
