@@ -32,7 +32,7 @@ def initLogger():
         rootLogger.setLevel(logging.INFO)
     return rootLogger
 
-def initLogger(level):
+def initLoggerWithCfg(level):
     try: 
         rootLogger = logging.getLogger()
         logging.config.fileConfig("pyLoggerConfig.cfg")
@@ -43,3 +43,16 @@ def initLogger(level):
         rootLogger.addHandler(logHandler)
         rootLogger.setLevel(level)
     return rootLogger
+
+############################################################################
+def initLogger(loglevel,loggerName):
+  handler = logging.StreamHandler(sys.stdout)
+  frm = logging.Formatter("%(asctime)s [%(levelname)-5s]: %(message)s", "%Y%m%d %H:%M:%S")
+  handler.setFormatter(frm)
+  logger = logging.getLogger(loggerName)
+  logger.addHandler(handler)
+  if loglevel == "DEBUG":
+    logger.setLevel(logging.DEBUG)
+  else:
+    logger.setLevel(logging.INFO)
+  return logger

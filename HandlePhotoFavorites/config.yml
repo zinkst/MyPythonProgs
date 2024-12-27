@@ -1,0 +1,15 @@
+loglevel: DEBUG
+loglevel: INFO
+toolMode: production
+# toolMode: develop
+srcRootDir: /links/Photos
+# srcRelativeDirName: "Sammlung/1920 - 2006 Familienphotos von Stefan"
+# srcRelativeDirName: "Sammlung/1986 - 2000 Stefan"
+srcRelativeDirName: "Sammlung"
+searchExtension: [jpeg,jpg,png]
+tgtDirName: "/links/Photos/Favoriten"
+linkRelativeTgtDirName: Symlinks
+compressedRelativeTgtDirName: Compressed
+createSymlinks: True
+shrinkPhoto: True
+favoritenInfoFileBaseName: FavoritenInfo.yml

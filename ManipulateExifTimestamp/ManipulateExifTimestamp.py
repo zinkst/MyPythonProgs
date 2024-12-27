@@ -231,11 +231,11 @@ def setGPSTimeStamp(activeTgtCompleteFileName):
 
 ###########################################################################
 def processFile(activeSrcCompleteFileName, activeTgtCompleteFileName, toolOptions):
-    #setTimestampFromWhatsAppFilename(activeSrcCompleteFileName, activeTgtCompleteFileName, toolOptions)
+    setTimestampFromWhatsAppFilename(activeSrcCompleteFileName, activeTgtCompleteFileName, toolOptions)
     #incrementTimestampFromFixedValue(activeSrcCompleteFileName, activeTgtCompleteFileName, toolOptions)
     #incrementTimestampFromMtime(activeSrcCompleteFileName, activeTgtCompleteFileName, toolOptions)
     #setTimestampFromDJIExportFilename(activeSrcCompleteFileName, activeTgtCompleteFileName, toolOptions)
-    setTimestampAndNameFromKomootPrintout(activeSrcCompleteFileName, activeTgtCompleteFileName, toolOptions)
+    #setTimestampAndNameFromKomootPrintout(activeSrcCompleteFileName, activeTgtCompleteFileName, toolOptions)
 
 ############################################################################
 # main starts here
@@ -247,7 +247,7 @@ rootLogger = initLogger()
 if len(sys.argv) == 1 :
     print(description)
     print((sys.argv[0] + "yaml config file"))
-    configFileName = 'config.yaml'
+    configFileName = 'configWA.yaml'
 else:
     configFileName=sys.argv[1]
 

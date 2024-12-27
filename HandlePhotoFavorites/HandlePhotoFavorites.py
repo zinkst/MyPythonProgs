@@ -2,27 +2,40 @@
 # -*- coding: utf-8 -*-
 import re
 from pyaml_env import parse_config
-import logging
 import pathlib
-import sys
 import os
 import datetime
 import argparse
 
-# imports of own library using symbolic links in folder to lib files since reltive imports 
+# imports of own library using symbolic links in folder to lib files since reltive imports
 # I didn't get to work
 from FileObject import FileObject
 from functions import initLogger
-from VideoFile import VideoFile
-
-
+from PhotoFileClass import PhotoFile
 description = """
-This program searches for Videos in ${srcRootDir}/${srcRelativeDirName}. The Videos there are symlinks to the Favorite Videos.
-It then creates a shrinked version of each found Video in ${tgtDirName}. It preserves the Directory structure of source Dir.
-If a corresponding videofile already exists in ther target dir, the shrinking is skipped.
+This program searches for Photos in ${srcRootDir}/${srcRelativeDirName} which have a rating defined in their metadata. 
+For each found Photo it can do two things
+1. create a relative symlink in ${tgtDirName}/${linkRelativeTgtDirName}
+   the Directory structure of source Dir is skipped
+2. creates a compressed version of the Photo in ${tgtDirName}/${compressedRelativeTgtDirName}
+   For the directory strucure of the target Dir in reads the File ${favoritenInfoFileBaseName} which must be created in the source dir. 
+   The creation of this fil can be done by the the `./CreateFavoritenInfoFile.py` tool
+If a corresponding photofile already exists in ther target dir, the corresponding file processing is skipped.
 
 To process only subdir of ${srcRootDir}/${srcRelativeDirName} the parameter -y ${subdirName} is available. Usually that is a year.
 """
+
+
+############################################################################
+def updateConfig(prgPath, args, config):
+  if args.year != None:
+    config["year"] = args.year
+  else:
+    config["year"] = ""
+  if config["toolMode"] != "production":
+    config["srcRootDir"] = os.path.join(prgPath, "testdata")
+    config["tgtDirName"] = os.path.join(prgPath, "testdata", "Favoriten")
+
 
 ############################################################################
 def createSearchPattern(searchExtension):
@@ -40,46 +53,29 @@ def createSearchPattern(searchExtension):
 
 ############################################################################
 def processDir(config):
-  filesWithMissingMetadata = []
+  filesWithIncompleteMetadata = []
   searchPattern = createSearchPattern(config["searchExtension"])
   fullSrcDirName = os.path.join(config["srcRootDir"], config["srcRelativeDirName"], config["year"])
   for srcDir, dirList, srcDirList in os.walk(fullSrcDirName):
     for srcFile in srcDirList:
       if re.search(searchPattern, srcFile, re.IGNORECASE) != None:
         srcAbsFileName = os.path.join(srcDir, srcFile)
-        logger.debug("Processing File: %s", srcAbsFileName)
         newFile = FileObject(srcAbsFileName, config["srcRootDir"], config["srcRelativeDirName"])
         logger.debug("Fileinfo for %s %s", newFile.fileBaseName, newFile)
-        videoFile = VideoFile(newFile, config, logger)
-        logger.debug("Videoinfo %s", videoFile)
-        if videoFile.targetFileExists() and not config.get("probeSrcFile") :
-          logger.info("File %s already exists - skipping ", videoFile.tgtFileName)
-        else: 
-          videoFile.ProbeVideoFile()
-          if videoFile.isMetadataUpdated() == True:
-            logger.info("Metadata was updated for Video \n %s", videoFile.fileObject.absFileName)
-            filesWithMissingMetadata.append(videoFile.fileObject.absFileName)
-          videoFile.FillMetadata()
-          logger.debug("Vital Video Metadata:\n %s", videoFile.printEssentialMetadata())
-          if config.get("convertVideoFile"):
-            videoFile.ConvertVideoFile()
-  return filesWithMissingMetadata
+        photoFile = PhotoFile(newFile, config, logger)
+        photoFile.ProbePhotoFileRating()
+        if photoFile.isFavoritePhoto:
+          logger.debug("Photoinfo %s", photoFile)
+          if config.get("createSymlinks"):
+            photoFile.CreateSymlinkForPhoto()
+          if config.get("shrinkPhoto"):
+            photoFile.ShrinkPhoto()
 
-############################################################################
-def writeFilesWithMissingMetadataToFile(missingMetadataFiles, config):
-  if len(missingMetadataFiles) > 0:
-    outFileName = os.path.join(config["tgtDirName"], config["year"], "missingMetadataFiles.txt")
-    with open(outFileName, 'w') as outfile:
-      for idx, entry in enumerate(missingMetadataFiles):
-        outline = str(k).ljust(5, ' ') + ": " + str(entry)
-        logger.info(outline)
-        outfile.write(entry + '\n')
-      outfile.write("Number of Found files : " + str(len(missingMetadataFiles)) + "\n") 
 
 ############################################################################
 # main starts here
 prgPath = pathlib.Path(__file__).parent.resolve()
-prgName = prgName = pathlib.Path(__file__).stem # os.path.basename(__file__)
+prgName = prgName = pathlib.Path(__file__).stem
 defaultConfigFileName = os.path.join(os.environ["HOME"], ".config", prgName, "config.yml")
 # defaultConfigFileName = os.path.join(prgPath, "config.yml")
 
@@ -91,12 +87,8 @@ print(args)
 
 config = parse_config(args.configFileName)
 
-logger = initLogger(config["loglevel"],__name__)
-
-if args.year != None:
-  config["year"] = args.year
-else:
-  config["year"] = ""
+logger = initLogger(config["loglevel"], __name__)
+updateConfig(prgPath, args, config)
 
 configStr = ""
 for k, v in config.items():
@@ -107,8 +99,7 @@ begin = datetime.datetime.now()
 beginFormatted = begin.strftime('%Y-%m-%d %H:%M:%S')
 logger.info("starting processing at " + beginFormatted)
 
-filesWithMissingMetadata = processDir(config)
-writeFilesWithMissingMetadataToFile(filesWithMissingMetadata, config)
+processDir(config)
 
 end = datetime.datetime.now()
 endFormatted = begin.strftime('%Y-%m-%d %H:%M:%S')
