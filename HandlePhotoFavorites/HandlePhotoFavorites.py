@@ -14,12 +14,22 @@ import argparse
 # I didn't get to work
 from FileObject import FileObject
 from functions import initLogger
-from VideoFile import VideoFile
-
 
 description = """
 This program processes all files in a directory
 """
+
+
+############################################################################
+def updateConfig(prgPath,args, config):
+  if args.year != None:
+    config["year"] = args.year
+  else:
+    config["year"] = ""
+  if config["toolMode"] != "production":
+    config["srcRootDir"] = os.path.join(prgPath,"testdata")
+    config["tgtDirName"] = os.path.join(prgPath,"testdata", "Favoriten")
+
 
 ############################################################################
 def createSearchPattern(searchExtension):
@@ -37,41 +47,27 @@ def createSearchPattern(searchExtension):
 
 ############################################################################
 def processDir(config):
-  filesWithMissingMetadata = []
+  filesWithIncompleteMetadata = []
   searchPattern = createSearchPattern(config["searchExtension"])
   fullSrcDirName = os.path.join(config["srcRootDir"], config["srcRelativeDirName"], config["year"])
   for srcDir, dirList, srcDirList in os.walk(fullSrcDirName):
     for srcFile in srcDirList:
       if re.search(searchPattern, srcFile, re.IGNORECASE) != None:
         srcAbsFileName = os.path.join(srcDir, srcFile)
-        logging.debug("Processing File: %s", srcAbsFileName)
+        # logging.debug("Processing File: %s", srcAbsFileName)
         newFile = FileObject(srcAbsFileName, config["srcRootDir"], config["srcRelativeDirName"])
         logging.debug("Fileinfo for %s %s", newFile.fileBaseName, newFile)
-        videoFile = VideoFile(newFile, config)
-        logging.debug("Videoinfo %s", videoFile)
-        if videoFile.targetFileExists() and not config.get("probeSrcFile") :
-          logging.info("File %s already exists - skipping ", videoFile.tgtFileName)
-        else: 
-          videoFile.ProbeVideoFile()
-          if videoFile.isMetadataUpdated() == True:
-            logging.info("Metadata was updated for Video \n %s", videoFile.fileObject.absFileName)
-            filesWithMissingMetadata.append(videoFile.fileObject.absFileName)
-          videoFile.FillMetadata()
-          logging.debug("Vital Video Metadata:\n %s", videoFile.printEssentialMetadata())
-          if config.get("convertVideoFile"):
-            videoFile.ConvertVideoFile()
-  return filesWithMissingMetadata
+        # videoFile = PhotoFile(newFile, config)
+        # logging.debug("Videoinfo %s", videoFile)
+        # if not videoFile.targetFileExists():
+        #   videoFile.ProbeVideoFile()
+        #   videoFile.FillMetadata()
+        #   if videoFile.() == True:
+        #     logging.info("Vital Metadata is missing for Video --- exiting \n %s", videoFile.fileObject.absFileName)
+        #     sys.exit(-1)
+        #   logging.debug("Vital Video Metadata:\n %s", videoFile.printEssentialMetadata())
+        #   videoFile.ConvertVideoFile()
 
-############################################################################
-def writeFilesWithMissingMetadataToFile(missingMetadataFiles, config):
-  if len(missingMetadataFiles) > 0:
-    outFileName = os.path.join(config["tgtDirName"], config["year"], "missingMetadataFiles.txt")
-    with open(outFileName, 'w') as outfile:
-      for idx, entry in enumerate(missingMetadataFiles):
-        outline = str(k).ljust(5, ' ') + ": " + str(entry)
-        logging.info(outline)
-        outfile.write(entry + '\n')
-      outfile.write("Number of Found files : " + str(len(missingMetadataFiles)) + "\n") 
 
 ############################################################################
 # main starts here
@@ -89,11 +85,7 @@ print(args)
 config = parse_config(args.configFileName)
 
 logger = initLogger(config["loglevel"])
-
-if args.year != None:
-  config["year"] = args.year
-else:
-  config["year"] = ""
+updateConfig(prgPath,args, config)
 
 configStr = ""
 for k, v in config.items():
@@ -104,8 +96,7 @@ begin = datetime.datetime.now()
 beginFormatted = begin.strftime('%Y-%m-%d %H:%M:%S')
 logging.info("starting processing at " + beginFormatted)
 
-filesWithMissingMetadata = processDir(config)
-writeFilesWithMissingMetadataToFile(filesWithMissingMetadata, config)
+processDir(config)
 
 end = datetime.datetime.now()
 endFormatted = begin.strftime('%Y-%m-%d %H:%M:%S')

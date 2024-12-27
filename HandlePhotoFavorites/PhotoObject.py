@@ -13,42 +13,11 @@ import ffmpeg
 # https://pymediainfo.readthedocs.io/en/stable/
 from pymediainfo import MediaInfo
 
-
-class FileObject:
-  absFileName = ""              # e.g  : /srcfiles/Videos/Favoriten/2024/202400_Sonstige/20020309_Video.mkv
-  srcFileDirName = ""           # e.g. : /srcfiles/Videos
-  srcRelativeDirName = ""       # e.g. : Favoriten
-  fileBaseName = ""             # e.g. : 20020309_Video.mkv
-  fileNameWithoutExtension = ""  # e.g. : 20020309_Video
-  extension = ""                # e.g. : mkv
-  srcRootDir = ""               # e.g. : /srcfiles/Videos
-  srcDirRelativeToRootDir = ""  # e.g. : 2024/202400_Sonstige
-
-  def __init__(self, absFileName, srcRootDir, srcRelativeDirName):
-    self.absFileName = absFileName
-    self.srcRootDir = srcRootDir
-    self.srcRelativeDirName = srcRelativeDirName
-    self.srcFileDirName = os.path.dirname(self.absFileName)
-    self.fileBaseName = os.path.basename(self.absFileName)
-    self.extension = os.path.splitext(self.fileBaseName)[1][1:]
-    self.srcDirRelativeToRootDir = self.srcFileDirName[len(self.srcRootDir) + len(srcRelativeDirName) + 2:]
-    self.fileNameWithoutExtension = os.path.splitext(self.fileBaseName)[0]
-
-  def __str__(self):
-    return f"""
-  {"fileBaseName".ljust(25, ' ')} : {self.fileBaseName}
-  {"dirName".ljust(25, ' ')} : {self.srcFileDirName}
-  {"fileBaseName".ljust(25, ' ')} : {self.fileBaseName}
-  {"extension".ljust(25, ' ')} : {self.extension}
-  {"srcRootDir".ljust(25, ' ')} : {self.srcRootDir}
-  {"srcDirRelativeToRootDir".ljust(25, ' ')} : {self.srcDirRelativeToRootDir}
-  """
+from FileObject import FileObject
 
 
-class VideoFile:
+class PhotoFile:
   fileObject = FileObject
-  fallBackCameraModel = ""
-  fallBackCameraManufacturer = ""
   tgtDirName = ""
   tgtFileName = ""
   metadata = {}  # {"KEY"},[ "string", Boolean ] Boolean True when metadata was empty and changed
@@ -59,27 +28,17 @@ class VideoFile:
   def __init__(self, fileObject, prgConfig):
     self.fileObject = fileObject
     self.prgConfig = prgConfig
-    self.fallBackCameraManufacturer = prgConfig.get("camera_manufacturer_name")
-    self.fallBackCameraModel = prgConfig.get("camera_model_name")
     self.tgtDirName = prgConfig.get("tgtDirName")
-    self.tgtVideoType = prgConfig.get("tgtVideoType")
     self.tgtFileName = os.path.join(self.tgtDirName, self.fileObject.srcDirRelativeToRootDir,
                                     self.fileObject.fileNameWithoutExtension + "." + self.tgtVideoType)
 
   def __str__(self):
-    output = "\n" + "VideoFile".ljust(25, ' ') + ": " + self.fileObject.absFileName + "\n"
+    output = "\n" + "PhotoFile".ljust(25, ' ') + ": " + self.fileObject.absFileName + "\n"
     for k, v in self.metadata.items():
       output += str(k).ljust(25, ' ') + ": " + str(v[0]) + "\n"
     for k, v in self.videoProps.items():
       output += str(k).ljust(25, ' ') + ": " + str(v) + "\n"
     return output
-  # f"""
-  #   metadata["date"]   : {self.metadata["date"]}
-  #   metadata["camera_manufacturer_name"] : {self.metadata["camera_manufacturer_name"]}
-  #   metadata["camera_model_name"] : {self.metadata["camera_model_name"]}
-  #   metadata["location"] = {self.metadata["location"]}
-  #   metadata["movie_name"] = {self.metadata["movie_name"]}
-  # """
 
   ##############################################################################################
   def ProbeVideoFile(self):
