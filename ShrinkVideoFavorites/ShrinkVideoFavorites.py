@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
-import logging.config
 import re
 from pyaml_env import parse_config
 import logging
@@ -31,7 +30,7 @@ def createSearchPattern(searchExtension):
     else:
       searchPattern = searchPattern + "|" + "." + searchExtension[i]
   searchPattern = searchPattern + ")"
-  logging.info("searchPattern :" + searchPattern)
+  logger.info("searchPattern :" + searchPattern)
   return searchPattern
 
 
@@ -44,20 +43,20 @@ def processDir(config):
     for srcFile in srcDirList:
       if re.search(searchPattern, srcFile, re.IGNORECASE) != None:
         srcAbsFileName = os.path.join(srcDir, srcFile)
-        logging.debug("Processing File: %s", srcAbsFileName)
+        logger.debug("Processing File: %s", srcAbsFileName)
         newFile = FileObject(srcAbsFileName, config["srcRootDir"], config["srcRelativeDirName"])
-        logging.debug("Fileinfo for %s %s", newFile.fileBaseName, newFile)
-        videoFile = VideoFile(newFile, config)
-        logging.debug("Videoinfo %s", videoFile)
+        logger.debug("Fileinfo for %s %s", newFile.fileBaseName, newFile)
+        videoFile = VideoFile(newFile, config, logger)
+        logger.debug("Videoinfo %s", videoFile)
         if videoFile.targetFileExists() and not config.get("probeSrcFile") :
-          logging.info("File %s already exists - skipping ", videoFile.tgtFileName)
+          logger.info("File %s already exists - skipping ", videoFile.tgtFileName)
         else: 
           videoFile.ProbeVideoFile()
           if videoFile.isMetadataUpdated() == True:
-            logging.info("Metadata was updated for Video \n %s", videoFile.fileObject.absFileName)
+            logger.info("Metadata was updated for Video \n %s", videoFile.fileObject.absFileName)
             filesWithMissingMetadata.append(videoFile.fileObject.absFileName)
           videoFile.FillMetadata()
-          logging.debug("Vital Video Metadata:\n %s", videoFile.printEssentialMetadata())
+          logger.debug("Vital Video Metadata:\n %s", videoFile.printEssentialMetadata())
           if config.get("convertVideoFile"):
             videoFile.ConvertVideoFile()
   return filesWithMissingMetadata
@@ -69,7 +68,7 @@ def writeFilesWithMissingMetadataToFile(missingMetadataFiles, config):
     with open(outFileName, 'w') as outfile:
       for idx, entry in enumerate(missingMetadataFiles):
         outline = str(k).ljust(5, ' ') + ": " + str(entry)
-        logging.info(outline)
+        logger.info(outline)
         outfile.write(entry + '\n')
       outfile.write("Number of Found files : " + str(len(missingMetadataFiles)) + "\n") 
 
@@ -88,7 +87,7 @@ print(args)
 
 config = parse_config(args.configFileName)
 
-logger = initLogger(config["loglevel"])
+logger = initLogger(config["loglevel"],__name__)
 
 if args.year != None:
   config["year"] = args.year
@@ -98,15 +97,15 @@ else:
 configStr = ""
 for k, v in config.items():
   configStr += str(k).ljust(31, ' ') + ": " + str(v) + "\n"
-logging.info("configuration used\n%s", configStr)
+logger.info("configuration used\n%s", configStr)
 
 begin = datetime.datetime.now()
 beginFormatted = begin.strftime('%Y-%m-%d %H:%M:%S')
-logging.info("starting processing at " + beginFormatted)
+logger.info("starting processing at " + beginFormatted)
 
 filesWithMissingMetadata = processDir(config)
 writeFilesWithMissingMetadataToFile(filesWithMissingMetadata, config)
 
 end = datetime.datetime.now()
 endFormatted = begin.strftime('%Y-%m-%d %H:%M:%S')
-logging.info("finished processing at " + endFormatted)
+logger.info("finished processing at " + endFormatted)

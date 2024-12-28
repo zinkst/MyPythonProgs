@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import os
-import logging
 import re
 
 # dnf install python3-ffmpeg-python.noarch
@@ -28,7 +27,8 @@ class VideoFile:
   vitalMetaDataKeys = ["date", "movie_name"]
   prgConfig = {}
 
-  def __init__(self, fileObject, prgConfig):
+  def __init__(self, fileObject, prgConfig, logger):
+    self.logger = logger
     self.fileObject = fileObject
     self.prgConfig = prgConfig
     self.fallBackCameraManufacturer = prgConfig.get("camera_manufacturer_name")
@@ -85,21 +85,21 @@ class VideoFile:
   ##############################################################################################
   def FillMetadata(self):
     if not self.metadata.get("date"):
-      logging.info("trying to compute date from filename %s ", os.path.join(
+      self.logger.info("trying to compute date from filename %s ", os.path.join(
         self.fileObject.srcDirRelativeToRootDir, self.fileObject.fileBaseName))
       computedDate = self.computeDateFromFileName()
       if computedDate != "":
         self.metadata["date"] = [computedDate, True]
     if not self.metadata.get("movie_name"):
-      logging.info("trying to compute movie_name from filename %s ", os.path.join(
+      self.logger.info("trying to compute movie_name from filename %s ", os.path.join(
         self.fileObject.srcDirRelativeToRootDir, self.fileObject.fileBaseName))
       computedMovieName = "TBD"
       self.metadata["movie_name"] = [computedMovieName, True]
     # if not self.metadata.get("camera_manufacturer_name"):
-    #   logging.info("setting camera_manufacturer_name to %s", self.fallBackCameraManufacturer)
+    #   self.logger.info("setting camera_manufacturer_name to %s", self.fallBackCameraManufacturer)
     #   # self.metadata["camera_manufacturer_name"] = [ self.fallBackCameraManufacturer, True ]
     # if not self.metadata.get("camera_model_name"):
-    #   logging.info("setting camera_model_name to %s", self.fallBackCameraModel)
+    #   self.logger.info("setting camera_model_name to %s", self.fallBackCameraModel)
     #   # self.metadata["camera_model_name"] = [ self.fallBackCameraModel, True ]
 
   ##############################################################################################
@@ -160,7 +160,7 @@ class VideoFile:
   ##############################################################################################
   def targetFileExists(self):
     if os.path.exists(self.tgtFileName):
-      logging.info("File %s already exists - skipping ", self.tgtFileName)
+      self.logger.info("File %s already exists - skipping ", self.tgtFileName)
       return True
     else:
       return False
@@ -171,7 +171,7 @@ class VideoFile:
       return
     if not os.path.exists(os.path.dirname(self.tgtFileName)):
       os.makedirs(os.path.dirname(self.tgtFileName))
-    logging.info("Converting to %s", self.tgtFileName)
+    self.logger.info("Converting to %s", self.tgtFileName)
     ffmpegArgs = {}
     ffmpegArgs["loglevel"] = "panic"
     ffmpegArgs["c:v"] = "libsvtav1"
@@ -194,8 +194,8 @@ class VideoFile:
       output = ffmpeg.output(input, self.tgtFileName, **ffmpegArgs)
       ffmpeg.run(output)
     except ffmpeg.Error as e:
-      logging.error("Error converting %s ", self.tgtFileName)
-      logging.error("deleting file %s ", self.tgtFileName)
+      self.logger.error("Error converting %s ", self.tgtFileName)
+      self.logger.error("deleting file %s ", self.tgtFileName)
       os.remove(self.tgtFileName)
 
   ##############################################################################################

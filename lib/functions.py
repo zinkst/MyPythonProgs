@@ -45,11 +45,11 @@ def initLoggerWithCfg(level):
     return rootLogger
 
 ############################################################################
-def initLogger(loglevel):
+def initLogger(loglevel,loggerName):
   handler = logging.StreamHandler(sys.stdout)
   frm = logging.Formatter("%(asctime)s [%(levelname)-5s]: %(message)s", "%Y%m%d %H:%M:%S")
   handler.setFormatter(frm)
-  logger = logging.getLogger()
+  logger = logging.getLogger(loggerName)
   logger.addHandler(handler)
   if loglevel == "DEBUG":
     logger.setLevel(logging.DEBUG)

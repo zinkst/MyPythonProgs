@@ -1,34 +1,31 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
-import logging.config
 import re
 from pyaml_env import parse_config
-import logging
 import pathlib
-import sys
 import os
 import datetime
 import argparse
 
-# imports of own library using symbolic links in folder to lib files since reltive imports 
+# imports of own library using symbolic links in folder to lib files since reltive imports
 # I didn't get to work
 from FileObject import FileObject
 from functions import initLogger
-
+from PhotoFileClass import PhotoFile
 description = """
 This program processes all files in a directory
 """
 
 
 ############################################################################
-def updateConfig(prgPath,args, config):
+def updateConfig(prgPath, args, config):
   if args.year != None:
     config["year"] = args.year
   else:
     config["year"] = ""
   if config["toolMode"] != "production":
-    config["srcRootDir"] = os.path.join(prgPath,"testdata")
-    config["tgtDirName"] = os.path.join(prgPath,"testdata", "Favoriten")
+    config["srcRootDir"] = os.path.join(prgPath, "testdata")
+    config["tgtDirName"] = os.path.join(prgPath, "testdata", "Favoriten")
 
 
 ############################################################################
@@ -41,7 +38,7 @@ def createSearchPattern(searchExtension):
     else:
       searchPattern = searchPattern + "|" + "." + searchExtension[i]
   searchPattern = searchPattern + ")"
-  logging.info("searchPattern :" + searchPattern)
+  logger.info("searchPattern :" + searchPattern)
   return searchPattern
 
 
@@ -54,18 +51,24 @@ def processDir(config):
     for srcFile in srcDirList:
       if re.search(searchPattern, srcFile, re.IGNORECASE) != None:
         srcAbsFileName = os.path.join(srcDir, srcFile)
-        # logging.debug("Processing File: %s", srcAbsFileName)
         newFile = FileObject(srcAbsFileName, config["srcRootDir"], config["srcRelativeDirName"])
-        logging.debug("Fileinfo for %s %s", newFile.fileBaseName, newFile)
-        # videoFile = PhotoFile(newFile, config)
-        # logging.debug("Videoinfo %s", videoFile)
-        # if not videoFile.targetFileExists():
-        #   videoFile.ProbeVideoFile()
+        logger.debug("Fileinfo for %s %s", newFile.fileBaseName, newFile)
+        photoFile = PhotoFile(newFile, config, logger)
+        logger.debug("Photoinfo %s", photoFile)
+        if photoFile.targetFileCompressedExists() and photoFile.targetFileSymlinkExists and not config.get("probeSrcFile"):
+          logger.info("Target Files %s already exists - skipping ",
+                      os.path.join(photoFile.fileObject.srcDirRelativeToRootDir, photoFile.fileObject.fileBaseName))
+        else:
+          photoFile.ProbePhotoFile()
+          if photoFile.isFavoritePhoto:
+            photoFile.CreateSymlinkForPhoto()
+            photoFile.CompressPhoto()
+            
         #   videoFile.FillMetadata()
         #   if videoFile.() == True:
-        #     logging.info("Vital Metadata is missing for Video --- exiting \n %s", videoFile.fileObject.absFileName)
+        #     logger.info("Vital Metadata is missing for Video --- exiting \n %s", videoFile.fileObject.absFileName)
         #     sys.exit(-1)
-        #   logging.debug("Vital Video Metadata:\n %s", videoFile.printEssentialMetadata())
+        #   logger.debug("Vital Video Metadata:\n %s", videoFile.printEssentialMetadata())
         #   videoFile.ConvertVideoFile()
 
 
@@ -84,20 +87,20 @@ print(args)
 
 config = parse_config(args.configFileName)
 
-logger = initLogger(config["loglevel"])
-updateConfig(prgPath,args, config)
+logger = initLogger(config["loglevel"], __name__)
+updateConfig(prgPath, args, config)
 
 configStr = ""
 for k, v in config.items():
   configStr += str(k).ljust(31, ' ') + ": " + str(v) + "\n"
-logging.info("configuration used\n%s", configStr)
+logger.info("configuration used\n%s", configStr)
 
 begin = datetime.datetime.now()
 beginFormatted = begin.strftime('%Y-%m-%d %H:%M:%S')
-logging.info("starting processing at " + beginFormatted)
+logger.info("starting processing at " + beginFormatted)
 
 processDir(config)
 
 end = datetime.datetime.now()
 endFormatted = begin.strftime('%Y-%m-%d %H:%M:%S')
-logging.info("finished processing at " + endFormatted)
+logger.info("finished processing at " + endFormatted)
