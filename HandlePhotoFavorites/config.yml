@@ -1,10 +1,12 @@
 loglevel: DEBUG
-loglevel: INFO
+# loglevel: INFO
 toolMode: production
 toolMode: develop
 srcRootDir: /links/Photos
 srcRelativeDirName: Sammlung
 searchExtension: [jpeg,jpg,png]
 tgtDirName: "/links/Photos/Favoriten"
+linkRelativeTgtDirName: SymlinksNew/Familie Zink
+compressedRelativeTgtDirName: Compressed/Familie Zink
 convertPhoto: True # if turned on videoFile will be shrinked if tgtFile doesn't exist
 probeSrcFile : True

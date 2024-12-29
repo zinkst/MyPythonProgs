@@ -21,12 +21,14 @@ from functions import initLogger
 
 class PhotoFile:
   fileObject = FileObject
-  tgtDirName = ""
-  tgtFileNameCompressed = ""
-  tgtFileNameSymlink = ""
-  srcLinkDepthToBaseDir = ""
+  tgtDirName = ""             # e.g.  /links/Photos/Favoriten
+  tgtFileNameCompressed = ""  # e.g.   ${tgtDirName}/${Compressed}/${yearOfPhoto}/${favoriteRelativeTgtDir}
+  tgtFileNameSymlink = ""     # e.g.  ${tgtDirName}/&{linkRelativeTgtDirName}/${yearOfPhoto}/${favoriteRelativeTgtDir}
   isFavoritePhoto = False
-
+  yearOfPhoto = ""            # e.g. 2024
+  favoriteRelativeTgtDir = "" # e.g. 202400_Sontige
+  tgtLinkLinkDepthToBaseDir = ""  # e.g. 2
+  
   metadata = {}
   # photoProps = {}
   vitalMetaDataKeys = ["date", "movie_name"]
@@ -37,14 +39,22 @@ class PhotoFile:
     self.fileObject = fileObject
     self.prgConfig = prgConfig
     self.tgtDirName = prgConfig.get("tgtDirName")
-    self.tgtFileNameCompressed = os.path.join(self.tgtDirName, "Compressed",
-                                              self.fileObject.srcDirRelativeToRootDir,
+    if prgConfig.get("year"):
+      self.yearOfPhoto = prgConfig.get("year")
+    else:
+      self.yearOfPhoto = self.fileObject.srcDirRelativeToRootDir[0:4]
+    self.tgtFileNameCompressed = os.path.join(self.tgtDirName, prgConfig.get("compressedRelativeTgtDirName"),
+                                              self.yearOfPhoto,
+                                              self.favoriteRelativeTgtDir,
                                               self.fileObject.fileBaseName)
-    self.srcLinkDepthToBaseDir = self.fileObject.srcRelativeDirName.count(os.sep) + 2 + self.fileObject.srcDirRelativeToRootDir.count(os.sep) + 1
-    self.tgtFileNameSymlink = os.path.join(self.tgtDirName, "SymlinksNew/Familie Zink",
-                                           self.fileObject.srcDirRelativeToRootDir,
+    self.tgtLinkLinkDepthToBaseDir = (prgConfig.get("linkRelativeTgtDirName").count(os.sep) + 1) + \
+        (self.yearOfPhoto.count(os.sep) + 1) + \
+        (self.favoriteRelativeTgtDir.count(os.sep) + 1)
+    self.tgtFileNameSymlink = os.path.join(self.tgtDirName, prgConfig.get("linkRelativeTgtDirName"),
+                                           self.yearOfPhoto,
+                                           self.favoriteRelativeTgtDir,
                                            self.fileObject.fileBaseName)
-    self.tgtRelativeLink = os.path.join((".." + os.sep) * self.srcLinkDepthToBaseDir,
+    self.tgtRelativeLink = os.path.join((".." + os.sep) * self.tgtLinkLinkDepthToBaseDir,
                                         self.fileObject.srcRelativeDirName,
                                         self.fileObject.srcDirRelativeToRootDir,
                                         self.fileObject.fileBaseName)
@@ -54,6 +64,9 @@ class PhotoFile:
     output += "FileName".ljust(25, ' ') + ": " + self.fileObject.absFileName + "\n"
     output += "tgtFilenameCompressed".ljust(25, ' ') + ": " + self.tgtFileNameCompressed + "\n"
     output += "tgtFilenameSymlink".ljust(25, ' ') + ": " + self.tgtFileNameSymlink + "\n"
+    output += "srcLinkDepthToBaseDir".ljust(25, ' ') + ": " + str(self.tgtLinkLinkDepthToBaseDir)+ "\n"
+    output += "yearOfPhoto".ljust(25, ' ') + ": " + self.yearOfPhoto + "\n"
+    output += "favoriteRelativeTgtDir".ljust(25, ' ') + ": " + self.favoriteRelativeTgtDir + "\n"
     for k, v in self.metadata.items():
       output += str(k).ljust(25, ' ') + ": " + str(v) + "\n"
     # for k, v in self.photoProps.items():
@@ -92,7 +105,7 @@ class PhotoFile:
   ##############################################################################################
   def targetFileSymlinkExists(self):
     if os.path.exists(self.tgtFileNameSymlink):
-      self.logger.info("Compressed File %s already exists - skipping ", self.tgtFileNameSymlink)
+      self.logger.info("Symlink File %s already exists - skipping ", self.tgtFileNameSymlink)
       return True
     else:
       os.makedirs(os.path.dirname(self.tgtFileNameSymlink), exist_ok=True)
