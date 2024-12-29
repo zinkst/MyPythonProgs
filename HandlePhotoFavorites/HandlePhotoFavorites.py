@@ -54,7 +54,6 @@ def processDir(config):
         newFile = FileObject(srcAbsFileName, config["srcRootDir"], config["srcRelativeDirName"])
         logger.debug("Fileinfo for %s %s", newFile.fileBaseName, newFile)
         photoFile = PhotoFile(newFile, config, logger)
-        # logger.debug("Photoinfo %s", photoFile)
         if photoFile.targetFileCompressedExists() and photoFile.targetFileSymlinkExists and not config.get("probeSrcFile"):
           logger.info("Target Files %s already exists - skipping ",
                       os.path.join(photoFile.fileObject.srcDirRelativeToRootDir, photoFile.fileObject.fileBaseName))

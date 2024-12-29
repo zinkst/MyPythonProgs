@@ -4,6 +4,7 @@
 import os
 import logging
 import re
+from pyaml_env import parse_config
 
 # dnf install python3-ffmpeg-python.noarch
 # docs: https://kkroening.github.io/ffmpeg-python/
@@ -16,6 +17,7 @@ from PIL.ExifTags import TAGS
 from FileObject import FileObject
 from functions import initLogger
 
+
 ####################################################################
 
 
@@ -26,12 +28,10 @@ class PhotoFile:
   tgtFileNameSymlink = ""     # e.g.  ${tgtDirName}/&{linkRelativeTgtDirName}/${yearOfPhoto}/${favoriteRelativeTgtDir}
   isFavoritePhoto = False
   yearOfPhoto = ""            # e.g. 2024
-  favoriteRelativeTgtDir = "" # e.g. 202400_Sontige
   tgtLinkLinkDepthToBaseDir = ""  # e.g. 2
-  
+
   metadata = {}
-  # photoProps = {}
-  vitalMetaDataKeys = ["date", "movie_name"]
+  favoriteFolderProps = {}
   prgConfig = {}
 
   def __init__(self, fileObject, prgConfig, logger):
@@ -43,30 +43,43 @@ class PhotoFile:
       self.yearOfPhoto = prgConfig.get("year")
     else:
       self.yearOfPhoto = self.fileObject.srcDirRelativeToRootDir[0:4]
-    self.tgtFileNameCompressed = os.path.join(self.tgtDirName, prgConfig.get("compressedRelativeTgtDirName"),
-                                              self.yearOfPhoto,
-                                              self.favoriteRelativeTgtDir,
-                                              self.fileObject.fileBaseName)
-    self.tgtLinkLinkDepthToBaseDir = (prgConfig.get("linkRelativeTgtDirName").count(os.sep) + 1) + \
-        (self.yearOfPhoto.count(os.sep) + 1) + \
-        (self.favoriteRelativeTgtDir.count(os.sep) + 1)
-    self.tgtFileNameSymlink = os.path.join(self.tgtDirName, prgConfig.get("linkRelativeTgtDirName"),
+    self.readTgtFolderInformation()
+    self.tgtLinkRelativeDir = os.path.join(prgConfig.get("linkRelativeTgtDirName"),
+                                           self.favoriteFolderProps.get("rootSubFolder"),
                                            self.yearOfPhoto,
-                                           self.favoriteRelativeTgtDir,
+                                           self.favoriteFolderProps.get("yearSubFolder"))
+    self.tgtLinkLinkDepthToBaseDir = 1 + self.tgtLinkRelativeDir.count(os.sep) + 1
+    self.tgtFileNameSymlink = os.path.join(self.tgtDirName,
+                                           self.tgtLinkRelativeDir, 
                                            self.fileObject.fileBaseName)
+    # self.tgtLinkLinkDepthToBaseDir = (prgConfig.get("linkRelativeTgtDirName").count(os.sep) + 1) + \
+    #     (self.yearOfPhoto.count(os.sep) + 1) + \
+    #     (self.favoriteFolderProps.get("yearSubFolder").count(os.sep) + 1)
+    # self.tgtFileNameSymlink = os.path.join(self.tgtDirName,
+    #                                        prgConfig.get("linkRelativeTgtDirName"),
+    #                                        self.favoriteFolderProps.get("rootSubFolder"),
+    #                                        self.yearOfPhoto,
+    #                                        self.favoriteFolderProps.get("yearSubFolder"),
+    #                                        self.fileObject.fileBaseName)
     self.tgtRelativeLink = os.path.join((".." + os.sep) * self.tgtLinkLinkDepthToBaseDir,
                                         self.fileObject.srcRelativeDirName,
                                         self.fileObject.srcDirRelativeToRootDir,
                                         self.fileObject.fileBaseName)
-
+    self.tgtFileNameCompressed = os.path.join(self.tgtDirName,
+                                              prgConfig.get("compressedRelativeTgtDirName"),
+                                              self.favoriteFolderProps.get("rootSubFolder"),
+                                              self.yearOfPhoto,
+                                              self.favoriteFolderProps.get("yearSubFolder"),
+                                              self.fileObject.fileBaseName)
+    
+  ##############################################################################################
   def __str__(self):
     output = "PhotoFile \n"
     output += "FileName".ljust(25, ' ') + ": " + self.fileObject.absFileName + "\n"
     output += "tgtFilenameCompressed".ljust(25, ' ') + ": " + self.tgtFileNameCompressed + "\n"
     output += "tgtFilenameSymlink".ljust(25, ' ') + ": " + self.tgtFileNameSymlink + "\n"
-    output += "srcLinkDepthToBaseDir".ljust(25, ' ') + ": " + str(self.tgtLinkLinkDepthToBaseDir)+ "\n"
-    output += "yearOfPhoto".ljust(25, ' ') + ": " + self.yearOfPhoto + "\n"
-    output += "favoriteRelativeTgtDir".ljust(25, ' ') + ": " + self.favoriteRelativeTgtDir + "\n"
+    output += "srcLinkDepthToBaseDir".ljust(25, ' ') + ": " + str(self.tgtLinkLinkDepthToBaseDir) + "\n"
+    output += "tgtLinkRelativeDir".ljust(25, ' ') + ": " + self.tgtLinkRelativeDir + "\n"
     for k, v in self.metadata.items():
       output += str(k).ljust(25, ' ') + ": " + str(v) + "\n"
     # for k, v in self.photoProps.items():
@@ -74,6 +87,20 @@ class PhotoFile:
     return output
 
   ##############################################################################################
+  # reads additional target FilenName Information for file FavoriteProperties.yml
+  # e.g.
+  # rootSubFolder: Familie Zink
+  # yearSubFolder: 201007_Skandinavien
+
+  def readTgtFolderInformation(self):
+    folderPropsFile = os.path.join(self.fileObject.srcFileDirName, "FavoriteProperties.yml")
+    if os.path.exists(folderPropsFile):
+      self.favoriteFolderProps = parse_config(folderPropsFile)
+    else:
+      self.logger.error("Folder Properties File %s does not exist - exiting ", folderPropsFile)
+      exit(-1)
+  ##############################################################################################
+
   def ProbePhotoFile(self):
     photo = Image.open(self.fileObject.absFileName)
     photoExifdata = photo.getexif()
