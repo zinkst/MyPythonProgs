@@ -60,7 +60,7 @@ def processDir(config):
         else:
           photoFile.ProbePhotoFile()
           if photoFile.isFavoritePhoto:
-            logger.debug("Photoinfo %s", photoFile)
+            # logger.debug("Photoinfo %s", photoFile)
             photoFile.CreateSymlinkForPhoto()
             photoFile.CompressPhoto()
             

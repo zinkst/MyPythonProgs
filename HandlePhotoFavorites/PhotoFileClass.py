@@ -43,7 +43,7 @@ class PhotoFile:
       self.yearOfPhoto = prgConfig.get("year")
     else:
       self.yearOfPhoto = self.fileObject.srcDirRelativeToRootDir[0:4]
-    self.readTgtFolderInformation()
+    self.readTgtFolderInformation(prgConfig.get("favoritenInfoFileBaseName"))
     self.tgtLinkRelativeDir = os.path.join(prgConfig.get("linkRelativeTgtDirName"),
                                            self.favoriteFolderProps.get("rootSubFolder"),
                                            self.yearOfPhoto,
@@ -92,8 +92,8 @@ class PhotoFile:
   # rootSubFolder: Familie Zink
   # yearSubFolder: 201007_Skandinavien
 
-  def readTgtFolderInformation(self):
-    folderPropsFile = os.path.join(self.fileObject.srcFileDirName, "FavoriteProperties.yml")
+  def readTgtFolderInformation(self, folderPropsFileBaseName):
+    folderPropsFile = os.path.join(self.fileObject.srcFileDirName, folderPropsFileBaseName)
     if os.path.exists(folderPropsFile):
       self.favoriteFolderProps = parse_config(folderPropsFile)
     else:
