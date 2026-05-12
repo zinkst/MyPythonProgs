@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 description = """This program converts Adresses obtained
 from the import Internet into CSVs for importing into OpenOffice

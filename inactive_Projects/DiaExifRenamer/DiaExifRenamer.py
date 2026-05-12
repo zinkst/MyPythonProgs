@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 description = """This program searches a given Source Directory for files and performs 
 a given operation (encode from asciii to utf8). The reencoded files are stored under target directory

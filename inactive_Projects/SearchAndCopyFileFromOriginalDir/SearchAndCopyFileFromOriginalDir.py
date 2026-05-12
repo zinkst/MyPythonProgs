@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 description = """This program handles handles directories with favorite Photos and creates a directory with absolute links to the original file

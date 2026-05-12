@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 description = """This program searches a given Source Directory for mp3 files and performs 
 reencoding of the mp3's. The reencoded files are stored under target directory

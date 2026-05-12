@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 description = """This program searches a given Source Directory for files and performs 
 a given operationThe reencoded files are stored under target directory
 preserving the directory structure. 
@@ -151,7 +151,7 @@ def incrementTimestampFromFixedValue(activeSrcCompleteFileName, activeTgtComplet
     metadata = pyexiv2.ImageMetadata(activeTgtCompleteFileName)
     # avaliable Tags see https://exiv2.org/tags.html
     metadata.read() 
-    initialTimestamp=datetime(2023, 5, 6, 18, 0,0)
+    initialTimestamp=datetime(2025,11, 9, 19, 0,0)
     if  runtimeData.previousDateTime == datetime(1970, 1, 1, 1, 0):
       runtimeData.previousDateTime=initialTimestamp
       runtimeData.currentIncrement=0  
@@ -231,8 +231,8 @@ def setGPSTimeStamp(activeTgtCompleteFileName):
 
 ###########################################################################
 def processFile(activeSrcCompleteFileName, activeTgtCompleteFileName, toolOptions):
-    setTimestampFromWhatsAppFilename(activeSrcCompleteFileName, activeTgtCompleteFileName, toolOptions)
-    #incrementTimestampFromFixedValue(activeSrcCompleteFileName, activeTgtCompleteFileName, toolOptions)
+    #setTimestampFromWhatsAppFilename(activeSrcCompleteFileName, activeTgtCompleteFileName, toolOptions)
+    incrementTimestampFromFixedValue(activeSrcCompleteFileName, activeTgtCompleteFileName, toolOptions)
     #incrementTimestampFromMtime(activeSrcCompleteFileName, activeTgtCompleteFileName, toolOptions)
     #setTimestampFromDJIExportFilename(activeSrcCompleteFileName, activeTgtCompleteFileName, toolOptions)
     #setTimestampAndNameFromKomootPrintout(activeSrcCompleteFileName, activeTgtCompleteFileName, toolOptions)
@@ -247,7 +247,7 @@ rootLogger = initLogger()
 if len(sys.argv) == 1 :
     print(description)
     print((sys.argv[0] + "yaml config file"))
-    configFileName = 'configWA.yaml'
+    configFileName = 'config.yaml'
 else:
     configFileName=sys.argv[1]
 

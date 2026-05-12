@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 description = """This program handles handles directories with relativeLinks to 
 favorite Photos and swap the links with the files  

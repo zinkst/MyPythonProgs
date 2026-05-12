@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 description = """This program handles hadles directories with absolutelinks to 
 favorite Photos, or files with lists to favorites Photos 

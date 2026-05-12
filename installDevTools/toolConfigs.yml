@@ -49,6 +49,11 @@ tools:
   version: latest # version: "0.0.5"
   downloadUrl: "https://github.com/migtools/crane/releases/download/v{{VERSION}}/amd64-linux-crane-v{{VERSION}}"
   type: binary
+- name: "shellyctl"
+  version: latest
+  downloadUrl: "https://github.com/jcodybaker/shellyctl/releases/download/v{{VERSION}}/shellyctl_linux_amd64"
+  type: binary
+
 ##################################################################
 ### binary TGZ
 - name: "kubectx"
